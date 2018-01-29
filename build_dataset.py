@@ -6,7 +6,7 @@ from __future__ import print_function
 import tensorflow as tf
 import os
 
-MY_DATASET_PATH = "/home/mathew/BabbyCNN/NWPU-RESISC45-MINI"
+MY_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45-MINI"
 
 MODE = 'folder'
 DATASET_PATH = MY_DATASET_PATH
@@ -18,6 +18,26 @@ print(N_CLASSES)
 IMG_HEIGHT = 64 # original size = 256
 IMG_WIDTH = 64 # original size = 256
 CHANNELS = 3 # we have full-color images
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Read dataset
 def read_images(dataset_path, mode, batch_size):
@@ -78,12 +98,32 @@ def read_images(dataset_path, mode, batch_size):
     return X, Y
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Set hyperparameters
 
 learning_rate = 0.001
-num_steps = 10
-batch_size = 128
-display_step = 100
+num_steps = 1000
+batch_size = 50
+display_step = 10
 dropout = 0.75
 
 # Build the data input
@@ -145,4 +185,4 @@ with tf.Session() as sess:
     print("Optimization Finished!")
 
     # Save your model
-    saver.save(sess, 'my_tf_model')
+    #saver.save(sess, 'my_tf_model')

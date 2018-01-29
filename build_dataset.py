@@ -6,12 +6,17 @@ from __future__ import print_function
 import tensorflow as tf
 import os
 
-MY_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45-MINI"
+MINI_OR_FULL = "MINI"
+MINI_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45-MINI"
+FULL_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45"
+
 
 MODE = 'folder'
-DATASET_PATH = MY_DATASET_PATH
+DATASET_PATH = FULL_DATASET_PATH
 
-N_CLASSES = 5
+MINI_N_CLASSES = 10
+FULL_N_CLASSES = 45
+N_CLASSES = FULL_N_CLASSES
 
 print(N_CLASSES)
 
@@ -122,7 +127,7 @@ def read_images(dataset_path, mode, batch_size):
 
 learning_rate = 0.001
 num_steps = 1000
-batch_size = 50
+batch_size = 450
 display_step = 10
 dropout = 0.75
 
@@ -185,4 +190,5 @@ with tf.Session() as sess:
     print("Optimization Finished!")
 
     # Save your model
-    #saver.save(sess, 'my_tf_model')
+    # saver.save(sess, 'my_tf_model')
+    saver.save(sess, '/home/mathew/my_tf_model/my_tf_model')

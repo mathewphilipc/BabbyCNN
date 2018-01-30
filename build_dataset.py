@@ -127,7 +127,7 @@ def read_images(dataset_path, mode, batch_size):
 
 learning_rate = 0.001
 num_steps = 1000
-batch_size = 450
+batch_size = 225
 display_step = 10
 dropout = 0.75
 

@@ -126,8 +126,8 @@ def read_images(dataset_path, mode, batch_size):
 # Set hyperparameters
 
 learning_rate = 0.001
-num_steps = 1000
-batch_size = 1000
+num_steps = 100
+batch_size = 100
 display_step = 10
 dropout = 0.75
 
@@ -136,15 +136,15 @@ X, Y = read_images(DATASET_PATH, MODE, batch_size)
 
 def conv_net(x, n_classes, dropout, reuse, is_training):
     with tf.variable_scope('ConvNet', reuse=reuse):
-        conv1 = tf.layers.conv2d(x, 32, 5, activation=tf.nn.relu)
-        conv1 = tf.layers.max_pooling2d(conv1, 2, 2)
-        conv2 = tf.layers.conv2d(conv1, 64, 3, activation=tf.nn.relu)
-        conv2 = tf.layers.max_pooling2d(conv2, 2, 2)
-        fc1 = tf.contrib.layers.flatten(conv2)
-        fc1 = tf.layers.dense(fc1, 1024)
-        fc1 = tf.layers.dropout(fc1, rate=dropout, training=is_training)
-        out = tf.layers.dense(fc1, n_classes)
-        out = tf.nn.softmax(out) if not is_training else out
+		conv1 = tf.layers.conv2d(x, 32, 5, activation=tf.nn.relu)
+		conv1 = tf.layers.max_pooling2d(conv1, 2, 2)
+		conv2 = tf.layers.conv2d(conv1, 64, 3, activation=tf.nn.relu)
+		conv2 = tf.layers.max_pooling2d(conv2, 2, 2)
+		fc1 = tf.contrib.layers.flatten(conv2)
+		fc1 = tf.layers.dense(fc1, 1024)
+		fc1 = tf.layers.dropout(fc1, rate=dropout, training=is_training)
+		out = tf.layers.dense(fc1, n_classes)
+		out = tf.nn.softmax(out) if not is_training else out
     return out
 
 logits_train = conv_net(X, N_CLASSES, dropout, reuse=False, is_training=True)

@@ -20,8 +20,8 @@ N_CLASSES = FULL_N_CLASSES
 
 print(N_CLASSES)
 
-IMG_HEIGHT = 28 # original size = 256
-IMG_WIDTH = 28 # original size = 256
+IMG_HEIGHT = 224 # original size = 256
+IMG_WIDTH = 224 # original size = 256
 CHANNELS = 3 # we have full-color images
 
 
@@ -126,46 +126,77 @@ def read_images(dataset_path, mode, batch_size):
 # Set hyperparameters
 
 learning_rate = 0.001
-num_steps = 25
+num_steps = 1000
 batch_size = 100
 display_step = 1
-dropout = 0.75
+dropout = 0.5
 
 # Build the data input
 X, Y = read_images(DATASET_PATH, MODE, batch_size)
 
 def conv_net(x, n_classes, dropout, reuse, is_training):
     with tf.variable_scope('ConvNet', reuse=reuse):
-		conv1 = tf.layers.conv2d(
+        conv1 = tf.layers.conv2d(
             inputs = x,
-            filters = 32, # previous: filters = 32
-            kernel_size = [5, 5],
+            filters = 96, # previous: filters = 32
+            kernel_size = [11, 11],
+            strides = (4,4),
             padding = "same",
             activation=tf.nn.relu)
-        # Output has shape [batch_size, IMG_WIDTH, IMG_HEIGHT, 32]
+            # Input Tensor Shape: [batch_size, 32, 32, 1]
+            # Output Tensor Shape: [batch_size, 32, 32, 96]
 
-		pool1 = tf.layers.max_pooling2d(
+        pool2 = tf.layers.max_pooling2d(
             inputs = conv1,
-            pool_size = [2, 2],
+            pool_size = 3,
             strides = 2)
+            # Input Tensor Shape: [batch_size, 32, 32, 32]
+            # Output Tensor Shape: [batch_size, 16, 16, 32]
 
-		conv2 = tf.layers.conv2d(
-            inputs = pool1,
-            filters = 64,
-            kernel_size = [3, 3],
-            activation=tf.nn.relu)
+        conv3 = tf.layers.conv2d(
+        inputs = pool2,
+        filters = 256,
+        kernel_size = [5, 5],
+        padding="same",
+        activation=tf.nn.relu)
+        # Input Tensor Shape: [batch_size, 16, 16, 32]
+        # Output Tensor Shape: [batch_size, 16, 16, 64]
 
-		pool2 = tf.layers.max_pooling2d(
-            inputs = conv2,
-            pool_size = [2, 2],
+
+        pool4 = tf.layers.max_pooling2d(
+            inputs = conv3,
+            pool_size = [3, 3],
             strides = 2)
+        # ;lkajsdf
 
-		pool2_flat = tf.contrib.layers.flatten(pool2)
+        conv5 = tf.layers.conv2d(
+            inputs = pool4,
+            filters = 384,
+            kernel_size = 3,
+            padding = "same",
+            activation = tf.nn.relu)
 
-		fc1 = tf.layers.dense(pool2_flat, 1024)
-		fc1 = tf.layers.dropout(fc1, rate=dropout, training=is_training)
-		out = tf.layers.dense(fc1, n_classes)
-		out = tf.nn.softmax(out) if not is_training else out
+        conv6 = tf.layers.conv2d(
+            inputs = conv5,
+            filters = 384,
+            kernel_size = 3,
+            padding="same",
+            activation = tf.nn.relu)
+
+        conv7 = tf.layers.conv2d(
+            inputs = conv6,
+            filters = 384,
+            kernel_size = 3,
+            padding="same",
+            activation = tf.nn.relu)
+
+
+        flattened = tf.contrib.layers.flatten(conv7)
+
+        fc1 = tf.layers.dense(flattened, 1024)
+        fc1 = tf.layers.dropout(fc1, rate=dropout, training=is_training)
+        out = tf.layers.dense(fc1, n_classes)
+        out = tf.nn.softmax(out) if not is_training else out
     return out
 
 logits_train = conv_net(X, N_CLASSES, dropout, reuse=False, is_training=True)

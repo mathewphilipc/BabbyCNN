@@ -20,8 +20,8 @@ N_CLASSES = FULL_N_CLASSES
 
 print(N_CLASSES)
 
-IMG_HEIGHT = 224 # original size = 256
-IMG_WIDTH = 224 # original size = 256
+IMG_HEIGHT = 128 # original size = 256
+IMG_WIDTH = 128 # original size = 256
 CHANNELS = 3 # we have full-color images
 
 
@@ -127,7 +127,7 @@ def read_images(dataset_path, mode, batch_size):
 
 learning_rate = 0.001
 num_steps = 1000
-batch_size = 100
+batch_size = 500
 display_step = 1
 dropout = 0.5
 
@@ -193,9 +193,11 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
 
         flattened = tf.contrib.layers.flatten(conv7)
 
-        fc1 = tf.layers.dense(flattened, 1024)
-        fc1 = tf.layers.dropout(fc1, rate=dropout, training=is_training)
-        out = tf.layers.dense(fc1, n_classes)
+        fc9 = tf.layers.dense(flattened, 1024)
+        fc9 = tf.layers.dropout(fc9, rate=dropout, training=is_training)
+        fc10 = tf.layers.dense(fc9, 1024)
+        fc10 = tf.layers.dropout(fc9, rate=dropout, training=is_training)
+        out = tf.layers.dense(fc10, n_classes)
         out = tf.nn.softmax(out) if not is_training else out
     return out
 

@@ -20,8 +20,8 @@ N_CLASSES = FULL_N_CLASSES
 
 print(N_CLASSES)
 
-IMG_HEIGHT = 256 # original size = 256
-IMG_WIDTH = 256 # original size = 256
+IMG_HEIGHT = 64 # original size = 256
+IMG_WIDTH = 64 # original size = 256
 CHANNELS = 3 # we have full-color images
 
 

@@ -192,15 +192,6 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
             strides = 1,
             padding = "valid",
             activation=tf.tanh)
-
-        conv3 = tf.layers.conv2d(
-            inputs = pool2,
-            filters = 16,
-            kernel_size = 5,
-            strides = 1,
-            padding = "valid",
-            activation=tf.tanh)
-
         conv3 = conv3a + conv3b
 
         pool4 = tf.layers.average_pooling2d(

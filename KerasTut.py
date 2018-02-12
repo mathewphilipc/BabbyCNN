@@ -56,5 +56,7 @@ model.compile(loss='categorical_crossentropy',
 # Training
 
 print("\n**********Training model**********\n")
-model.fit(X_train, Y_train,
-	batch_size=32, nb_epoch=10, verbose=1)
+#model.fit(X_train, Y_train,
+#	batch_size=32, nb_epoch=10, verbose=1)
+
+# 

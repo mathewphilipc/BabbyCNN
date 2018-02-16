@@ -138,8 +138,8 @@ def read_images(dataset_path, mode, batch_size):
 # Set hyperparameters
 
 learning_rate = 0.001
-num_steps = 10
-batch_size = 1000
+num_steps = 100
+batch_size = 100
 display_step = 1
 dropout = 0.5
 
@@ -172,30 +172,29 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
             padding = "valid",
             activation=tf.tanh)
 
-        pool2 = tf.layers.average_pooling2d(
+        pool1 = tf.layers.average_pooling2d(
             inputs = conv1,
             pool_size = 2,
             strides = 2)
 
-        conv3a = tf.layers.conv2d(
-            inputs = pool2,
+        conv2a = tf.layers.conv2d(
+            inputs = pool1,
             filters = 16,
             kernel_size = 5,
             strides = 1,
             padding = "valid",
             activation=tf.tanh)
 
-        conv3b = tf.layers.conv2d(
-            inputs = pool2,
+        conv2b = tf.layers.conv2d(
+            inputs = pool1,
             filters = 16,
             kernel_size = 5,
             strides = 1,
             padding = "valid",
-            activation=tf.tanh)
-        conv3 = conv3a + conv3b
+            activation=tf.tanh) + conv2a
 
         pool4 = tf.layers.average_pooling2d(
-            inputs = conv3,
+            inputs = conv2b,
             pool_size = 2,
             strides = 2)
 

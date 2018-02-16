@@ -139,7 +139,7 @@ def read_images(dataset_path, mode, batch_size):
 
 learning_rate = 0.001
 num_steps = 10000
-batch_size = 10
+batch_size = 1000
 display_step = 1
 dropout = 0.5
 
@@ -175,12 +175,11 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
             activation=tf.tanh)
         initPool = tf.layers.max_pooling2d(
             inputs = initConv,
-            pool_size = 2,
+            pool_size = 3,
             strides = 2,
-            padding='valid')
+            padding="same")
 
         # first residual block
-
         res1a = tf.layers.conv2d(
             inputs = initPool,
             filters = 64,
@@ -188,50 +187,48 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
             strides = 1,
             padding = "same",
             activation=tf.nn.relu)
-
-        res2a = tf.layers.conv2d(
+        res1b = tf.layers.conv2d(
             inputs = res1a,
             filters = 64,
             kernel_size = 7,
             strides = 1,
             padding = "same",
             activation=tf.tanh)
+        res1 = initPool + res1b
 
-        conv2a = tf.layers.conv2d(
-            inputs = initPool,
-            filters = 16,
-            kernel_size = 5,
+        # second residual block
+        res2a = tf.layers.conv2d(
+            inputs = res1,
+            filters = 64,
+            kernel_size = 7,
             strides = 1,
-            padding = "valid",
-            activation=tf.tanh)
-
-        conv2b = tf.layers.conv2d(
-            inputs = initPool,
-            filters = 16,
-            kernel_size = 5,
-            strides = 1,
-            padding = "valid",
-            activation=tf.tanh) + conv2a
-
-        pool4 = tf.layers.average_pooling2d(
-            inputs = conv2b,
-            pool_size = 2,
-            strides = 2)
-
-        conv5 = tf.layers.conv2d(
-            inputs = pool4,
-            filters = 120,
-            kernel_size = 3,
             padding = "same",
-            activation = tf.nn.relu)
+            activation=tf.nn.relu)
+        res2b = tf.layers.conv2d(
+            inputs = res2a,
+            filters = 64,
+            kernel_size = 7,
+            strides = 1,
+            padding = "same",
+            activation=tf.tanh)
+        res2 = res1 + res2b
 
-        flattened = tf.contrib.layers.flatten(conv5)
+        # done with res blocks
+        # Time for avgpool, then a dense layer (sans dropout), then softmax
 
-        fc9 = tf.layers.dense(flattened, 84)
-        fc9 = tf.layers.dropout(fc9, rate=dropout, training=is_training)
-        fc10 = tf.layers.dense(fc9, 10)
-        fc10 = tf.layers.dropout(fc9, rate=dropout, training=is_training)
-        out = tf.layers.dense(fc10, n_classes)
+        finalPool = tf.layers.average_pooling2d(
+        	inputs = res2,
+        	pool_size = 7,
+        	strides = 1,
+        	padding = "valid")
+
+        flattened = tf.contrib.layers.flatten(finalPool)
+
+        connected = tf.layers.dense(
+        	inputs = flattened,
+        	units = 84)
+
+        out = tf.layers.dense(connected, n_classes)
         out = tf.nn.softmax(out) if not is_training else out
     return out
 

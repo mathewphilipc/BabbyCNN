@@ -32,8 +32,8 @@ N_CLASSES = FULL_N_CLASSES
 
 # print(N_CLASSES)
 
-IMG_HEIGHT = 16 # original size = 256
-IMG_WIDTH = 16 # original size = 256
+IMG_HEIGHT = 32 # original size = 256
+IMG_WIDTH = 32 # original size = 256
 CHANNELS = 3 # we have full-color images
 
 
@@ -138,8 +138,8 @@ def read_images(dataset_path, mode, batch_size):
 # Set hyperparameters
 
 learning_rate = 0.001
-num_steps = 100
-batch_size = 100
+num_steps = 10000
+batch_size = 10
 display_step = 1
 dropout = 0.5
 
@@ -164,21 +164,41 @@ N_DIGITS = FULL_N_CLASSES
 
 def conv_net(x, n_classes, dropout, reuse, is_training):
     with tf.variable_scope('ConvNet', reuse=reuse):
-        conv1 = tf.layers.conv2d(
+
+    	# same start as GoogLeNet
+        initConv = tf.layers.conv2d(
             inputs = x,
-            filters = 6,
-            kernel_size = 5,
+            filters = 64,
+            kernel_size = 7,
+            strides = 2,
+            padding = "same",
+            activation=tf.tanh)
+        initPool = tf.layers.max_pooling2d(
+            inputs = initConv,
+            pool_size = 2,
+            strides = 2,
+            padding='valid')
+
+        # first residual block
+
+        res1a = tf.layers.conv2d(
+            inputs = initPool,
+            filters = 64,
+            kernel_size = 7,
             strides = 1,
-            padding = "valid",
+            padding = "same",
+            activation=tf.nn.relu)
+
+        res2a = tf.layers.conv2d(
+            inputs = res1a,
+            filters = 64,
+            kernel_size = 7,
+            strides = 1,
+            padding = "same",
             activation=tf.tanh)
 
-        pool1 = tf.layers.average_pooling2d(
-            inputs = conv1,
-            pool_size = 2,
-            strides = 2)
-
         conv2a = tf.layers.conv2d(
-            inputs = pool1,
+            inputs = initPool,
             filters = 16,
             kernel_size = 5,
             strides = 1,
@@ -186,7 +206,7 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
             activation=tf.tanh)
 
         conv2b = tf.layers.conv2d(
-            inputs = pool1,
+            inputs = initPool,
             filters = 16,
             kernel_size = 5,
             strides = 1,

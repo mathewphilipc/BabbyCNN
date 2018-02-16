@@ -139,7 +139,7 @@ def read_images(dataset_path, mode, batch_size):
 
 learning_rate = 0.001
 num_steps = 10000
-batch_size = 1000
+batch_size = 10
 display_step = 1
 dropout = 0.5
 
@@ -187,14 +187,24 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
             strides = 1,
             padding = "same",
             activation=tf.nn.relu)
-        res1b = tf.layers.conv2d(
-            inputs = res1a,
+
+        res1b = tf.contrib.layers.batch_norm(
+        	inputs = res1a)
+
+        res1c = tf.layers.conv2d(
+            inputs = res1b,
             filters = 64,
             kernel_size = 7,
             strides = 1,
             padding = "same",
-            activation=tf.tanh)
-        res1 = initPool + res1b
+            activation = None)
+
+        res1d = tf.contrib.layers.batch_norm(
+        	inputs = res1c)
+
+        res1e = initPool + res1d
+
+        res1 = tf.nn.relu(res1e)
 
         # second residual block
         res2a = tf.layers.conv2d(
@@ -226,7 +236,7 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
 
         connected = tf.layers.dense(
         	inputs = flattened,
-        	units = 84)
+        	units = 1000)
 
         out = tf.layers.dense(connected, n_classes)
         out = tf.nn.softmax(out) if not is_training else out

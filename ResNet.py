@@ -199,12 +199,9 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
             padding = "same",
             activation = None)
 
-        res1d = tf.contrib.layers.batch_norm(
-        	inputs = res1c)
+        res1d = tf.contrib.layers.batch_norm(inputs = res1c)
 
-        res1e = initPool + res1d
-
-        res1 = tf.nn.relu(res1e)
+        res1 = tf.nn.relu(initPool + res1d)
 
         # second residual block
         res2a = tf.layers.conv2d(

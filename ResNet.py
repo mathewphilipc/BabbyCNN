@@ -216,19 +216,17 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
 
 
         # res block 3
-
-
         res3a = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
             inputs = res2,
             filters = 128,
-            kernel_size = 7,
+            kernel_size = 3,
             strides = 2,
             padding = "same",
             activation=tf.nn.relu))
         res3b = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
             inputs = res3a,
             filters = 128,
-            kernel_size = 7,
+            kernel_size = 3,
             strides = 1,
             padding = "same",
             activation = None))
@@ -236,19 +234,36 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
             inputs = res2,
             filters = 128,
             kernel_size = 1,
-            strides=2,
+            strides = 2,
             padding="same",
             activation = None))
 
         res3 = tf.nn.relu(res3c + res3b)
+
+
+        res4a = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
+            inputs = res3,
+            filters = 128,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation=tf.nn.relu))
+        res4b = tf.contrib.layers.batch_norm(tf.layers.conv2d(
+            inputs = res4a,
+            filters = 128,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation = None))
+        res4 = tf.nn.relu(res3 + res4b)
         # done with res blocks
         # Time for avgpool, then a dense layer (sans dropout), then softmax
 
         finalPool = tf.layers.average_pooling2d(
-        	inputs = res2,
+        	inputs = res4,
         	pool_size = 7,
         	strides = 1,
-        	padding = "valid")
+        	padding = "same")
 
         flattened = tf.contrib.layers.flatten(finalPool)
 

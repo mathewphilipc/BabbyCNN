@@ -282,7 +282,7 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
 
         res5 = tf.nn.relu(res5c + res5b)
 
-        # res block 4
+        # res block 6
         res6a = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
             inputs = res5,
             filters = 256,
@@ -298,11 +298,57 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
             padding = "same",
             activation = None))
         res6 = tf.nn.relu(res5 + res6b)
+
+
+
+        # res block 5
+        res7a = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
+            inputs = res6,
+            filters = 512,
+            kernel_size = 3,
+            strides = 2,
+            padding = "same",
+            activation=tf.nn.relu))
+        res7b = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
+            inputs = res7a,
+            filters = 512,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation = None))
+        res7c = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
+            inputs = res6,
+            filters = 512,
+            kernel_size = 1,
+            strides = 2,
+            padding="same",
+            activation = None))
+
+        res7 = tf.nn.relu(res7c + res7b)
+
+        # res block 8
+        res8a = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
+            inputs = res7,
+            filters = 512,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation=tf.nn.relu))
+        res8b = tf.contrib.layers.batch_norm(tf.layers.conv2d(
+            inputs = res8a,
+            filters = 512,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation = None))
+        res8 = tf.nn.relu(res7 + res8b)
+
+
         # done with res blocks
         # Time for avgpool, then a dense layer (sans dropout), then softmax
 
         finalPool = tf.layers.average_pooling2d(
-        	inputs = res6,
+        	inputs = res8,
         	pool_size = 7,
         	strides = 1,
         	padding = "same")

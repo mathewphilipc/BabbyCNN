@@ -240,7 +240,7 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
 
         res3 = tf.nn.relu(res3c + res3b)
 
-
+        # res block 4
         res4a = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
             inputs = res3,
             filters = 128,
@@ -256,11 +256,53 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
             padding = "same",
             activation = None))
         res4 = tf.nn.relu(res3 + res4b)
+
+        # res block 5
+        res5a = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
+            inputs = res4,
+            filters = 256,
+            kernel_size = 3,
+            strides = 2,
+            padding = "same",
+            activation=tf.nn.relu))
+        res5b = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
+            inputs = res5a,
+            filters = 256,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation = None))
+        res5c = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
+            inputs = res4,
+            filters = 256,
+            kernel_size = 1,
+            strides = 2,
+            padding="same",
+            activation = None))
+
+        res5 = tf.nn.relu(res5c + res5b)
+
+        # res block 4
+        res6a = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
+            inputs = res5,
+            filters = 256,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation=tf.nn.relu))
+        res6b = tf.contrib.layers.batch_norm(tf.layers.conv2d(
+            inputs = res6a,
+            filters = 256,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation = None))
+        res6 = tf.nn.relu(res5 + res6b)
         # done with res blocks
         # Time for avgpool, then a dense layer (sans dropout), then softmax
 
         finalPool = tf.layers.average_pooling2d(
-        	inputs = res4,
+        	inputs = res6,
         	pool_size = 7,
         	strides = 1,
         	padding = "same")

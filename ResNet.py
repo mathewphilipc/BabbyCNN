@@ -7,7 +7,6 @@ from keras.applications.resnet50 import ResNet50
 from keras.preprocessing import image
 from keras.applications.resnet50 import preprocess_input, decode_predictions
 
-#model = ResNet50(weights = 'imagenet')
 
 # https://github.com/aymericdamien/TensorFlow-Examples/ (cont.)
 # blob/master/examples/5_DataManagement/build_an_image_dataset.py
@@ -141,7 +140,7 @@ learning_rate = 0.001
 num_steps = 10000
 batch_size = 1000
 display_step = 1
-dropout = 0.5
+dropout = 0.0
 
 # Build the data input
 #X_train, Y_train = read_images(DATASET_PATH, MODE, batch_size)

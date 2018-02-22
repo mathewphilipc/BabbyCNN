@@ -137,11 +137,11 @@ def read_images(dataset_path, mode, batch_size):
 
 # Set hyperparameters
 
-learning_rate = 0.001
+learning_rate = 0.0001
 num_steps = 10000
-batch_size = 1000
+batch_size = 2000
 display_step = 1
-dropout = 0.5
+dropout = 0.0
 
 # Build the data input
 #X_train, Y_train = read_images(DATASET_PATH, MODE, batch_size)

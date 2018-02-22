@@ -32,8 +32,8 @@ N_CLASSES = FULL_N_CLASSES
 
 # print(N_CLASSES)
 
-IMG_HEIGHT = 16 # original size = 256
-IMG_WIDTH = 16 # original size = 256
+IMG_HEIGHT = 32 # original size = 256
+IMG_WIDTH = 32 # original size = 256
 CHANNELS = 3 # we have full-color images
 
 
@@ -55,9 +55,9 @@ def read_images(dataset_path, mode, batch_size):
             train_labels.append(int(d.split(' ')[1]))
             test_labels.append(int(d.split(' ')[1]))
     elif mode == 'folder':
-    	# Count how many (image, label) pairs go into testing vs training
-    	total_test_count = 0;
-    	total_train_count = 0;
+        # Count how many (image, label) pairs go into testing vs training
+        total_test_count = 0;
+        total_train_count = 0;
         # An ID will be affected to each sub-folders by alphabetical order
         label = 0
         image_count = 0;
@@ -138,7 +138,7 @@ def read_images(dataset_path, mode, batch_size):
 # Set hyperparameters
 
 learning_rate = 0.001
-num_steps = 10
+num_steps = 10000
 batch_size = 1000
 display_step = 1
 dropout = 0.5
@@ -149,11 +149,11 @@ dropout = 0.5
 train_image, test_image, train_label, test_label, total_train_count, total_test_count = read_images(DATASET_PATH, MODE, batch_size)
 
 X_train, Y_train = tf.train.batch([train_image, train_label], batch_size=batch_size,
-	capacity=batch_size * 8, num_threads=4)
+    capacity=batch_size * 8, num_threads=4)
 
 # Use entire testing set for every accuracy check
 X_test, Y_test = tf.train.batch([test_image, test_label], batch_size=total_test_count,
-	capacity=batch_size * 8, num_threads=4)
+    capacity=batch_size * 8, num_threads=4)
 
 
 print("\nDone randomly selecting %d training images and %d test images\n" % (total_train_count, total_test_count))
@@ -164,55 +164,166 @@ N_DIGITS = FULL_N_CLASSES
 
 def conv_net(x, n_classes, dropout, reuse, is_training):
     with tf.variable_scope('ConvNet', reuse=reuse):
-        conv1 = tf.layers.conv2d(
+
+        # same start as GoogLeNet
+        initConv = tf.layers.conv2d(
             inputs = x,
-            filters = 6,
-            kernel_size = 5,
-            strides = 1,
-            padding = "valid",
-            activation=tf.tanh)
-
-        pool2 = tf.layers.average_pooling2d(
-            inputs = conv1,
-            pool_size = 2,
-            strides = 2)
-
-        conv3a = tf.layers.conv2d(
-            inputs = pool2,
-            filters = 16,
-            kernel_size = 5,
-            strides = 1,
-            padding = "valid",
-            activation=tf.tanh)
-
-        conv3b = tf.layers.conv2d(
-            inputs = pool2,
-            filters = 16,
-            kernel_size = 5,
-            strides = 1,
-            padding = "valid",
-            activation=tf.tanh)
-        conv3 = conv3a + conv3b
-
-        pool4 = tf.layers.average_pooling2d(
-            inputs = conv3,
-            pool_size = 2,
-            strides = 2)
-
-        conv5 = tf.layers.conv2d(
-            inputs = pool4,
-            filters = 120,
-            kernel_size = 3,
+            filters = 64,
+            kernel_size = 7,
+            strides = 2,
             padding = "same",
-            activation = tf.nn.relu)
+            activation=tf.tanh)
 
-        flattened = tf.contrib.layers.flatten(conv5)
+        initPool = tf.layers.max_pooling2d(
+            inputs = initConv,
+            pool_size = 3,
+            strides = 2,
+            padding="same")
 
-        fc9 = tf.layers.dense(flattened, 84)
-        fc9 = tf.layers.dropout(fc9, rate=dropout, training=is_training)
-        fc10 = tf.layers.dense(fc9, 10)
-        fc10 = tf.layers.dropout(fc9, rate=dropout, training=is_training)
-        out = tf.layers.dense(fc10, n_classes)
+        # first residual block
+        res1a = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
+            inputs = initPool,
+            filters = 64,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation=tf.nn.relu))
+        res1b = tf.layers.conv2d(
+            inputs = res1a,
+            filters = 64,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation = None)
+        res1 = tf.nn.relu(initPool + tf.contrib.layers.batch_norm(inputs = res1b))
+
+
+
+
+
+        res2a = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
+            inputs = res1,
+            filters = 64,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation=tf.nn.relu))
+        res2b = tf.contrib.layers.batch_norm(tf.layers.conv2d(
+            inputs = res2a,
+            filters = 64,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation = None))
+        res2 = tf.nn.relu(res1 + res2b)
+
+
+
+
+
+        res3a = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
+            inputs = res2,
+            filters = 128,
+            kernel_size = 3,
+            strides = 2,
+            padding = "same",
+            activation=tf.nn.relu))
+        res3b = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
+            inputs = res3a,
+            filters = 128,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation = None))
+        res3c = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
+            inputs = res2,
+            filters = 128,
+            kernel_size = 1,
+            strides = 2,
+            padding="same",
+            activation = None))
+        res3 = tf.nn.relu(res3c + res3b)
+
+
+
+
+
+        res4a = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
+            inputs = res3,
+            filters = 128,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation=tf.nn.relu))
+        res4b = tf.contrib.layers.batch_norm(tf.layers.conv2d(
+            inputs = res4a,
+            filters = 128,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation = None))
+        res4 = tf.nn.relu(res3 + res4b)
+
+
+
+
+
+        res5a = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
+            inputs = res4,
+            filters = 256,
+            kernel_size = 3,
+            strides = 2,
+            padding = "same",
+            activation=tf.nn.relu))
+        res5b = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
+            inputs = res5a,
+            filters = 256,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation = None))
+        res5c = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
+            inputs = res4,
+            filters = 256,
+            kernel_size = 1,
+            strides = 2,
+            padding="same",
+            activation = None))
+        res5 = tf.nn.relu(res5c + res5b)
+
+        # res block 6
+        res6a = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
+            inputs = res5,
+            filters = 256,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation=tf.nn.relu))
+        res6b = tf.contrib.layers.batch_norm(tf.layers.conv2d(
+            inputs = res6a,
+            filters = 256,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation = None))
+        res6 = tf.nn.relu(res5 + res6b)
+
+        # done with res blocks
+        # Time for avgpool, then a dense layer (sans dropout), then softmax
+
+        finalPool = tf.layers.average_pooling2d(
+            inputs = res6,
+            pool_size = 7,
+            strides = 1,
+            padding = "same")
+
+        flattened = tf.contrib.layers.flatten(finalPool)
+
+        connected = tf.layers.dense(
+            inputs = flattened,
+            units = 1000)
+
+        out = tf.layers.dense(connected, n_classes)
         out = tf.nn.softmax(out) if not is_training else out
     return out
 
@@ -220,7 +331,7 @@ logits_train = conv_net(X_train, N_CLASSES, dropout, reuse=False, is_training=Tr
 logits_test = conv_net(X_test, N_CLASSES, dropout, reuse=True, is_training=False)
 
 loss_op = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
-	logits=logits_train, labels=Y_train))
+    logits=logits_train, labels=Y_train))
 optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
 train_op = optimizer.minimize(loss_op)
 

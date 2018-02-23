@@ -7,8 +7,6 @@ from keras.applications.resnet50 import ResNet50
 from keras.preprocessing import image
 from keras.applications.resnet50 import preprocess_input, decode_predictions
 
-#model = ResNet50(weights = 'imagenet')
-
 # https://github.com/aymericdamien/TensorFlow-Examples/ (cont.)
 # blob/master/examples/5_DataManagement/build_an_image_dataset.py
 
@@ -95,13 +93,6 @@ def read_images(dataset_path, mode, batch_size):
     else:
         raise Exception("Unknown mode.")
 
-#    print("\n\n****************************************")
-#    print("Total training images: %d" % total_train_count)
-#    print("Total testing images: %d" % total_test_count)
-#    portion = 100.0*(total_train_count + 0.0) / (total_train_count + total_test_count + 0.0)
-#    print("Portion used for training: %f " % portion)
-#    print("****************************************\n\n")
-
     # Convert to Tensor
     train_imagepaths = tf.convert_to_tensor(train_imagepaths, dtype=tf.string)
     train_labels = tf.convert_to_tensor(train_labels, dtype=tf.int32)
@@ -135,11 +126,24 @@ def read_images(dataset_path, mode, batch_size):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Set hyperparameters
 
-learning_rate = 0.0001
+learning_rate = 0.00001
 num_steps = 10000
-batch_size = 2000
+batch_size = 1000
 display_step = 1
 dropout = 0.0
 
@@ -179,6 +183,16 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
             pool_size = 3,
             strides = 2,
             padding="same")
+
+        initNorm = tf.nn.local_response_normalization(
+            input = initPool,
+            depth_radius = 4,
+            bias=1.0,
+            alpha = 1.0,
+            beta = 0.5,
+            name = None)
+
+
 
         # first residual block
         res1a = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
@@ -221,98 +235,11 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
 
 
 
-        res3a = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
-            inputs = res2,
-            filters = 128,
-            kernel_size = 3,
-            strides = 2,
-            padding = "same",
-            activation=tf.nn.relu))
-        res3b = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
-            inputs = res3a,
-            filters = 128,
-            kernel_size = 3,
-            strides = 1,
-            padding = "same",
-            activation = None))
-        res3c = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
-            inputs = res2,
-            filters = 128,
-            kernel_size = 1,
-            strides = 2,
-            padding="same",
-            activation = None))
-        res3 = tf.nn.relu(res3c + res3b)
-
-
-
-
-
-        res4a = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
-            inputs = res3,
-            filters = 128,
-            kernel_size = 3,
-            strides = 1,
-            padding = "same",
-            activation=tf.nn.relu))
-        res4b = tf.contrib.layers.batch_norm(tf.layers.conv2d(
-            inputs = res4a,
-            filters = 128,
-            kernel_size = 3,
-            strides = 1,
-            padding = "same",
-            activation = None))
-        res4 = tf.nn.relu(res3 + res4b)
-
-
-
-
-
-        res5a = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
-            inputs = res4,
-            filters = 256,
-            kernel_size = 3,
-            strides = 2,
-            padding = "same",
-            activation=tf.nn.relu))
-        res5b = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
-            inputs = res5a,
-            filters = 256,
-            kernel_size = 3,
-            strides = 1,
-            padding = "same",
-            activation = None))
-        res5c = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
-            inputs = res4,
-            filters = 256,
-            kernel_size = 1,
-            strides = 2,
-            padding="same",
-            activation = None))
-        res5 = tf.nn.relu(res5c + res5b)
-
-        # res block 6
-        res6a = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
-            inputs = res5,
-            filters = 256,
-            kernel_size = 3,
-            strides = 1,
-            padding = "same",
-            activation=tf.nn.relu))
-        res6b = tf.contrib.layers.batch_norm(tf.layers.conv2d(
-            inputs = res6a,
-            filters = 256,
-            kernel_size = 3,
-            strides = 1,
-            padding = "same",
-            activation = None))
-        res6 = tf.nn.relu(res5 + res6b)
-
         # done with res blocks
         # Time for avgpool, then a dense layer (sans dropout), then softmax
 
         finalPool = tf.layers.average_pooling2d(
-            inputs = res6,
+            inputs = res2,
             pool_size = 7,
             strides = 1,
             padding = "same")

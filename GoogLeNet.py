@@ -196,7 +196,7 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
 
         # first residual block
         res1a = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
-            inputs = initPool,
+            inputs = initNorm,
             filters = 64,
             kernel_size = 3,
             strides = 1,

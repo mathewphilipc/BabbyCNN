@@ -165,6 +165,66 @@ print("\nDone randomly selecting %d training images and %d test images\n" % (tot
 N_DIGITS = FULL_N_CLASSES
 
 
+def incept_layer(inputlayer):
+        layer1a = tf.layers.conv2d(
+            inputs = inputlayer,
+            filters = 96,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation=tf.tanh)
+
+        layer1b = tf.layers.conv2d(
+            inputs = inputlayer,
+            filters = 16,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation=tf.tanh)
+
+        layer1c = tf.layers.max_pooling2d(
+            inputs = inputlayer,
+            pool_size = 3,
+            strides = 1,
+            padding="same")
+
+        layer2a = tf.layers.conv2d(
+            inputs = inputlayer,
+            filters = 64,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation=tf.tanh)
+
+        layer2b = tf.layers.conv2d(
+            inputs = layer1a,
+            filters = 128,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation=tf.tanh)
+
+        layer2c = tf.layers.conv2d(
+            inputs = layer1a,
+            filters = 32,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation=tf.tanh)
+
+        layer2d = tf.layers.conv2d(
+            inputs = layer1a,
+            filters = 32,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation=tf.tanh)
+
+        layerOut = tf.concat([layer2a, layer2b, layer2c, layer2c], 3)
+
+        return layerOut
+
+
 
 def conv_net(x, n_classes, dropout, reuse, is_training):
     with tf.variable_scope('ConvNet', reuse=reuse):
@@ -284,8 +344,13 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
 
 
 
+
+        incept1 = incept_layer(pool7)
+
+
+
         finalPool = tf.layers.average_pooling2d(
-            inputs = inceptOut,
+            inputs = incept1,
             pool_size = 7,
             strides = 1,
             padding = "same")

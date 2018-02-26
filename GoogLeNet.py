@@ -141,11 +141,11 @@ def read_images(dataset_path, mode, batch_size):
 
 # Set hyperparameters
 
-learning_rate = 0.00001
+learning_rate = 0.000001
 num_steps = 10000
 batch_size = 1000
 display_step = 1
-dropout = 0.0
+dropout = 0.4
 
 # Build the data input
 #X_train, Y_train = read_images(DATASET_PATH, MODE, batch_size)
@@ -313,12 +313,17 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
         incept14 = incept_layer(incept13, 144, 32, 112, 288, 64, 64)
         incept15 = incept_layer(incept14, 160, 32, 256, 320, 128, 128)
 
+        pool16 = tf.layers.max_pooling2d(
+            inputs = incept15,
+            pool_size = 3,
+            strides = 2,
+            padding = "same")
 
-
-
+        incept17 = incept_layer(pool16, 160, 32, 256, 320, 128, 128)
+        incept18 = incept_layer(incept17, 192, 48, 384, 384, 128, 128)
 
         finalPool = tf.layers.average_pooling2d(
-            inputs = incept15,
+            inputs = incept18,
             pool_size = 7,
             strides = 1,
             padding = "same")

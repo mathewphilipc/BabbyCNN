@@ -280,10 +280,12 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
             padding = "same",
             activation=tf.tanh)
 
+        inceptOut = tf.concat([incept2a, incept2b, incept2c, incept2c], 3)
+
 
 
         finalPool = tf.layers.average_pooling2d(
-            inputs = incept2d,
+            inputs = inceptOut,
             pool_size = 7,
             strides = 1,
             padding = "same")

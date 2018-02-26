@@ -165,10 +165,10 @@ print("\nDone randomly selecting %d training images and %d test images\n" % (tot
 N_DIGITS = FULL_N_CLASSES
 
 
-def incept_layer(inputlayer):
+def incept_layer(inputlayer, filters1a, filters1b, filters2a, filters2b, filters2c, filters2d):
         layer1a = tf.layers.conv2d(
             inputs = inputlayer,
-            filters = 96,
+            filters = filters1a,
             kernel_size = 3,
             strides = 1,
             padding = "same",
@@ -176,7 +176,7 @@ def incept_layer(inputlayer):
 
         layer1b = tf.layers.conv2d(
             inputs = inputlayer,
-            filters = 16,
+            filters = filters1a,
             kernel_size = 3,
             strides = 1,
             padding = "same",
@@ -190,7 +190,7 @@ def incept_layer(inputlayer):
 
         layer2a = tf.layers.conv2d(
             inputs = inputlayer,
-            filters = 64,
+            filters = filters2a,
             kernel_size = 3,
             strides = 1,
             padding = "same",
@@ -198,7 +198,7 @@ def incept_layer(inputlayer):
 
         layer2b = tf.layers.conv2d(
             inputs = layer1a,
-            filters = 128,
+            filters = filters2b,
             kernel_size = 3,
             strides = 1,
             padding = "same",
@@ -206,7 +206,7 @@ def incept_layer(inputlayer):
 
         layer2c = tf.layers.conv2d(
             inputs = layer1a,
-            filters = 32,
+            filters = filters2c,
             kernel_size = 3,
             strides = 1,
             padding = "same",
@@ -214,15 +214,17 @@ def incept_layer(inputlayer):
 
         layer2d = tf.layers.conv2d(
             inputs = layer1a,
-            filters = 32,
+            filters = filters2d,
             kernel_size = 3,
             strides = 1,
             padding = "same",
             activation=tf.tanh)
 
-        layerOut = tf.concat([layer2a, layer2b, layer2c, layer2c], 3)
+        layerOut = tf.concat([layer2a, layer2b, layer2c, layer2d], 3)
 
         return layerOut
+
+
 
 
 
@@ -284,73 +286,39 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
 
         # First inception module
 
-        # First layer of inception module
 
-        incept1a = tf.layers.conv2d(
-            inputs = pool7,
-            filters = 96,
-            kernel_size = 3,
-            strides = 1,
-            padding = "same",
-            activation=tf.tanh)
 
-        incept1b = tf.layers.conv2d(
-            inputs = pool7,
-            filters = 16,
-            kernel_size = 3,
-            strides = 1,
-            padding = "same",
-            activation=tf.tanh)
+# inputlayer, filters1a, filters1b, filters1c, filters2a, filters2b, filters2c, filters2d
 
-        incept1c = tf.layers.max_pooling2d(
-            inputs = pool7,
+        incept8 = incept_layer(
+            inputlayer = pool7,
+            filters1a = 96,
+            filters1b = 16, 
+            filters2a = 64, 
+            filters2b = 128,
+            filters2c = 32,
+            filters2d = 32)
+
+        incept9 = incept_layer(incept8, 128, 32, 128, 192, 96, 64)
+
+        pool10 = tf.layers.max_pooling2d(
+            inputs = incept9,
             pool_size = 3,
-            strides = 1,
+            strides = 2,
             padding="same")
 
-        incept2a = tf.layers.conv2d(
-            inputs = pool7,
-            filters = 64,
-            kernel_size = 3,
-            strides = 1,
-            padding = "same",
-            activation=tf.tanh)
-
-        incept2b = tf.layers.conv2d(
-            inputs = incept1a,
-            filters = 128,
-            kernel_size = 3,
-            strides = 1,
-            padding = "same",
-            activation=tf.tanh)
-
-        incept2c = tf.layers.conv2d(
-            inputs = incept1a,
-            filters = 32,
-            kernel_size = 3,
-            strides = 1,
-            padding = "same",
-            activation=tf.tanh)
-
-        incept2d = tf.layers.conv2d(
-            inputs = incept1a,
-            filters = 32,
-            kernel_size = 3,
-            strides = 1,
-            padding = "same",
-            activation=tf.tanh)
-
-        inceptOut = tf.concat([incept2a, incept2b, incept2c, incept2c], 3)
+        incept11 = incept_layer(pool10, 96, 16, 192, 208, 48, 64)
+        incept12 = incept_layer(incept11, 112, 24, 160, 224, 64, 64)
+        incept13 = incept_layer(incept12, 128, 24, 128, 256, 64, 64)
+        incept14 = incept_layer(incept13, 144, 32, 112, 288, 64, 64)
+        incept15 = incept_layer(incept14, 160, 32, 256, 320, 128, 128)
 
 
-
-
-        incept1 = incept_layer(pool7)
 
 
 
         finalPool = tf.layers.average_pooling2d(
-            inputs = incept1,
+            inputs = incept15,
             pool_size = 7,
             strides = 1,
             padding = "same")

@@ -169,8 +169,7 @@ N_DIGITS = FULL_N_CLASSES
 def conv_net(x, n_classes, dropout, reuse, is_training):
     with tf.variable_scope('ConvNet', reuse=reuse):
 
-        # same start as GoogLeNet
-        initConv = tf.layers.conv2d(
+        conv1 = tf.layers.conv2d(
             inputs = x,
             filters = 64,
             kernel_size = 7,
@@ -178,25 +177,36 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
             padding = "same",
             activation=tf.tanh)
 
-        initPool = tf.layers.max_pooling2d(
-            inputs = initConv,
+        pool2 = tf.layers.max_pooling2d(
+            inputs = conv1,
             pool_size = 3,
             strides = 2,
             padding="same")
 
-        initNorm = tf.nn.local_response_normalization(
-            input = initPool,
+        norm3 = tf.nn.local_response_normalization(
+            input = pool2,
             depth_radius = 4,
             bias=1.0,
             alpha = 1.0,
             beta = 0.5,
             name = None)
 
+        conv4 = tf.layers.conv2d(
+            inputs = norm3,
+            filters = 64,
+            kernel_size = 1,
+            strides = 1,
+            padding = "same",
+            activation=tf.tanh)
+
+
+
+
 
 
         # first residual block
         res1a = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
-            inputs = initNorm,
+            inputs = norm3,
             filters = 64,
             kernel_size = 3,
             strides = 1,
@@ -209,27 +219,8 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
             strides = 1,
             padding = "same",
             activation = None)
-        res1 = tf.nn.relu(initPool + tf.contrib.layers.batch_norm(inputs = res1b))
+        res1 = tf.nn.relu(pool2 + tf.contrib.layers.batch_norm(inputs = res1b))
 
-
-
-
-
-        res2a = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
-            inputs = res1,
-            filters = 64,
-            kernel_size = 3,
-            strides = 1,
-            padding = "same",
-            activation=tf.nn.relu))
-        res2b = tf.contrib.layers.batch_norm(tf.layers.conv2d(
-            inputs = res2a,
-            filters = 64,
-            kernel_size = 3,
-            strides = 1,
-            padding = "same",
-            activation = None))
-        res2 = tf.nn.relu(res1 + res2b)
 
 
 
@@ -239,7 +230,7 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
         # Time for avgpool, then a dense layer (sans dropout), then softmax
 
         finalPool = tf.layers.average_pooling2d(
-            inputs = res2,
+            inputs = res1,
             pool_size = 7,
             strides = 1,
             padding = "same")

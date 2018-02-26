@@ -199,38 +199,91 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
             padding = "same",
             activation=tf.tanh)
 
+        conv5 = tf.layers.conv2d(
+            inputs = conv4,
+            filters = 192,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation=tf.tanh)
+
+        norm6 = tf.nn.local_response_normalization(
+            input = conv5,
+            depth_radius = 4,
+            bias=1.0,
+            alpha = 1.0,
+            beta = 0.5,
+            name = None)
+
+        pool7 = tf.layers.max_pooling2d(
+            inputs = norm6,
+            pool_size = 3,
+            strides = 2,
+            padding="same")
 
 
+        # First inception module
 
+        # First layer of inception module
 
+        incept1a = tf.layers.conv2d(
+            inputs = pool7,
+            filters = 96,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation=tf.tanh)
 
-        # first residual block
-        res1a = tf.contrib.layers.batch_norm(inputs = tf.layers.conv2d(
-            inputs = norm3,
+        incept1b = tf.layers.conv2d(
+            inputs = pool7,
+            filters = 16,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation=tf.tanh)
+
+        incept1c = tf.layers.max_pooling2d(
+            inputs = pool7,
+            pool_size = 3,
+            strides = 1,
+            padding="same")
+
+        incept2a = tf.layers.conv2d(
+            inputs = pool7,
             filters = 64,
             kernel_size = 3,
             strides = 1,
             padding = "same",
-            activation=tf.nn.relu))
-        res1b = tf.layers.conv2d(
-            inputs = res1a,
-            filters = 64,
+            activation=tf.tanh)
+
+        incept2b = tf.layers.conv2d(
+            inputs = incept1a,
+            filters = 128,
             kernel_size = 3,
             strides = 1,
             padding = "same",
-            activation = None)
-        res1 = tf.nn.relu(pool2 + tf.contrib.layers.batch_norm(inputs = res1b))
+            activation=tf.tanh)
+
+        incept2c = tf.layers.conv2d(
+            inputs = incept1a,
+            filters = 32,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation=tf.tanh)
+
+        incept2d = tf.layers.conv2d(
+            inputs = incept1a,
+            filters = 32,
+            kernel_size = 3,
+            strides = 1,
+            padding = "same",
+            activation=tf.tanh)
 
 
-
-
-
-
-        # done with res blocks
-        # Time for avgpool, then a dense layer (sans dropout), then softmax
 
         finalPool = tf.layers.average_pooling2d(
-            inputs = res1,
+            inputs = incept2d,
             pool_size = 7,
             strides = 1,
             padding = "same")

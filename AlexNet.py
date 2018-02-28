@@ -227,7 +227,7 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
             activation=tf.nn.relu)
 
         norm5 = tf.nn.local_response_normalization(
-            input = conv1,
+            input = conv4,
             depth_radius = 2,
             bias = 1.0,
             alpha = 0.00002,

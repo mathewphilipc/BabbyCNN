@@ -29,28 +29,12 @@ CHANNELS = 3 # we have full-color images
 
 TRAIN_FRAC = 0.90
 
-# Test random number generation
-# np.random.rand()
-#print("\n\n\n Random number time \n\n\n")
-#testRand = np.random.rand()
-#print("\n\n\n %f \n\n\n" % testRand)
 
 
 
 
 
 
-
-
-
-
-#def get_batches(train_image, train_label, batch_size):
-#   X_train, Y_train = tf.train.batch([train_image, train_label], batch_size=batch_size,
-#       capacity=batch_size * 8, num_threads=4)
-#   return X_train, Y_train
-
-#total_test_count = 0;
-#total_train_count = 0;
 
 
 
@@ -146,26 +130,6 @@ def read_images(dataset_path, mode, batch_size):
     print("\nFound all images and labels in NWPU-RESISC45...\n")
 
     return train_image, test_image, train_label, test_label, total_train_count, total_test_count
-
-#    X_train, Y_train = tf.train.batch([train_image, train_label], batch_size=batch_size,
-#                          capacity=batch_size * 8,
-#                          num_threads=4)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

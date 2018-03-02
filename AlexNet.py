@@ -93,13 +93,6 @@ def read_images(dataset_path, mode, batch_size):
     else:
         raise Exception("Unknown mode.")
 
-#    print("\n\n****************************************")
-#    print("Total training images: %d" % total_train_count)
-#    print("Total testing images: %d" % total_test_count)
-#    portion = 100.0*(total_train_count + 0.0) / (total_train_count + total_test_count + 0.0)
-#    print("Portion used for training: %f " % portion)
-#    print("****************************************\n\n")
-
     # Convert to Tensor
     train_imagepaths = tf.convert_to_tensor(train_imagepaths, dtype=tf.string)
     train_labels = tf.convert_to_tensor(train_labels, dtype=tf.int32)
@@ -146,7 +139,6 @@ display_step = 1
 dropout = 0.5
 
 # Build the data input
-#X_train, Y_train = read_images(DATASET_PATH, MODE, batch_size)
 
 train_image, test_image, train_label, test_label, total_train_count, total_test_count = read_images(DATASET_PATH, MODE, batch_size)
 

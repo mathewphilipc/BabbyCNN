@@ -1,16 +1,7 @@
-from __future__ import print_function
-
-import tensorflow as tf
-import numpy as np
-
-from keras.applications.resnet50 import ResNet50
-from keras.preprocessing import image
-from keras.applications.resnet50 import preprocess_input, decode_predictions
-
-
 # https://github.com/aymericdamien/TensorFlow-Examples/ (cont.)
 # blob/master/examples/5_DataManagement/build_an_image_dataset.py
 
+from __future__ import print_function
 
 import tensorflow as tf
 import os
@@ -31,8 +22,8 @@ N_CLASSES = FULL_N_CLASSES
 
 # print(N_CLASSES)
 
-IMG_HEIGHT = 32 # original size = 256
-IMG_WIDTH = 32 # original size = 256
+IMG_HEIGHT = 64 # original size = 256
+IMG_WIDTH = 64 # original size = 256
 CHANNELS = 3 # we have full-color images
 
 
@@ -54,9 +45,9 @@ def read_images(dataset_path, mode, batch_size):
             train_labels.append(int(d.split(' ')[1]))
             test_labels.append(int(d.split(' ')[1]))
     elif mode == 'folder':
-    	# Count how many (image, label) pairs go into testing vs training
-    	total_test_count = 0;
-    	total_train_count = 0;
+        # Count how many (image, label) pairs go into testing vs training
+        total_test_count = 0;
+        total_train_count = 0;
         # An ID will be affected to each sub-folders by alphabetical order
         label = 0
         image_count = 0;
@@ -132,27 +123,30 @@ def read_images(dataset_path, mode, batch_size):
 
     return train_image, test_image, train_label, test_label, total_train_count, total_test_count
 
+#    X_train, Y_train = tf.train.batch([train_image, train_label], batch_size=batch_size,
+#                          capacity=batch_size * 8,
+#                          num_threads=4)
+
 
 
 # Set hyperparameters
 
-learning_rate = 0.001
+learning_rate = 0.0003
 num_steps = 10000
 batch_size = 1000
 display_step = 1
 dropout = 0.0
 
 # Build the data input
-#X_train, Y_train = read_images(DATASET_PATH, MODE, batch_size)
 
 train_image, test_image, train_label, test_label, total_train_count, total_test_count = read_images(DATASET_PATH, MODE, batch_size)
 
 X_train, Y_train = tf.train.batch([train_image, train_label], batch_size=batch_size,
-	capacity=batch_size * 8, num_threads=4)
+    capacity=batch_size * 8, num_threads=4)
 
 # Use entire testing set for every accuracy check
 X_test, Y_test = tf.train.batch([test_image, test_label], batch_size=total_test_count,
-	capacity=batch_size * 8, num_threads=4)
+    capacity=batch_size * 8, num_threads=4)
 
 
 print("\nDone randomly selecting %d training images and %d test images\n" % (total_train_count, total_test_count))
@@ -164,7 +158,7 @@ N_DIGITS = FULL_N_CLASSES
 def conv_net(x, n_classes, dropout, reuse, is_training):
     with tf.variable_scope('ConvNet', reuse=reuse):
 
-    	# same start as GoogLeNet
+        # same start as GoogLeNet
         initConv = tf.layers.conv2d(
             inputs = x,
             filters = 64,
@@ -405,16 +399,16 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
         # Time for avgpool, then a dense layer (sans dropout), then softmax
 
         finalPool = tf.layers.average_pooling2d(
-        	inputs = res10,
-        	pool_size = 7,
-        	strides = 1,
-        	padding = "same")
+            inputs = res10,
+            pool_size = 7,
+            strides = 1,
+            padding = "same")
 
         flattened = tf.contrib.layers.flatten(finalPool)
 
         connected = tf.layers.dense(
-        	inputs = flattened,
-        	units = 1000)
+            inputs = flattened,
+            units = 1000)
 
         out = tf.layers.dense(connected, n_classes)
         out = tf.nn.softmax(out) if not is_training else out
@@ -424,7 +418,7 @@ logits_train = conv_net(X_train, N_CLASSES, dropout, reuse=False, is_training=Tr
 logits_test = conv_net(X_test, N_CLASSES, dropout, reuse=True, is_training=False)
 
 loss_op = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
-	logits=logits_train, labels=Y_train))
+    logits=logits_train, labels=Y_train))
 optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
 train_op = optimizer.minimize(loss_op)
 

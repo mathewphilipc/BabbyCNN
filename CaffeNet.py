@@ -29,30 +29,6 @@ CHANNELS = 3 # we have full-color images
 
 TRAIN_FRAC = 0.90
 
-# Test random number generation
-# np.random.rand()
-#print("\n\n\n Random number time \n\n\n")
-#testRand = np.random.rand()
-#print("\n\n\n %f \n\n\n" % testRand)
-
-
-
-
-
-
-
-
-
-
-#def get_batches(train_image, train_label, batch_size):
-#   X_train, Y_train = tf.train.batch([train_image, train_label], batch_size=batch_size,
-#       capacity=batch_size * 8, num_threads=4)
-#   return X_train, Y_train
-
-#total_test_count = 0;
-#total_train_count = 0;
-
-
 
 # Read dataset
 def read_images(dataset_path, mode, batch_size):
@@ -109,12 +85,6 @@ def read_images(dataset_path, mode, batch_size):
     else:
         raise Exception("Unknown mode.")
 
-#    print("\n\n****************************************")
-#    print("Total training images: %d" % total_train_count)
-#    print("Total testing images: %d" % total_test_count)
-#    portion = 100.0*(total_train_count + 0.0) / (total_train_count + total_test_count + 0.0)
-#    print("Portion used for training: %f " % portion)
-#    print("****************************************\n\n")
 
     # Convert to Tensor
     train_imagepaths = tf.convert_to_tensor(train_imagepaths, dtype=tf.string)

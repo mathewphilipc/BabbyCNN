@@ -1,15 +1,10 @@
+# https://github.com/aymericdamien/TensorFlow-Examples/ (cont.)
+# blob/master/examples/5_DataManagement/build_an_image_dataset.py
+
 from __future__ import print_function
 
 import tensorflow as tf
 import numpy as np
-
-from keras.applications.resnet50 import ResNet50
-from keras.preprocessing import image
-from keras.applications.resnet50 import preprocess_input, decode_predictions
-
-# https://github.com/aymericdamien/TensorFlow-Examples/ (cont.)
-# blob/master/examples/5_DataManagement/build_an_image_dataset.py
-
 
 import tensorflow as tf
 import os

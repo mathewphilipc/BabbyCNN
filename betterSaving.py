@@ -133,8 +133,8 @@ def read_images(dataset_path, mode, batch_size):
 # Set hyperparameters
 
 learning_rate = 0.0001
-num_steps = 3
-batch_size = 1000
+num_steps = 2
+batch_size = 10
 display_step = 1
 dropout = 0.5
 
@@ -252,8 +252,8 @@ saver = tf.train.Saver()
 with tf.Session() as sess:
     # Run the initializer
     sess.run(init)
-    
-    # Start the data queue
+ 
+   # Start the data queue
     coord = tf.train.Coordinator()
     threads = tf.train.start_queue_runners(coord=coord)
 
@@ -276,4 +276,9 @@ with tf.Session() as sess:
     print("Optimization Finished!")
 
     # Save model
-    saver.save(sess, "my_test_model", global_step=1)
+
+    save_path = saver.save(sess, "/tmp/model.ckpt")
+    print("Model saved in path: %s" % save_path)
+
+    # https://www.tensorflow.org/programmers_guide/saved_model
+    # http://cv-tricks.com/tensorflow-tutorial/save-restore-tensorflow-models-quick-complete-tutorial/

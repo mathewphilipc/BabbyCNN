@@ -22,12 +22,20 @@ N_CLASSES = FULL_N_CLASSES
 
 # print(N_CLASSES)
 
-IMG_HEIGHT = 32 # original size = 256
-IMG_WIDTH = 32 # original size = 256
+IMG_HEIGHT = 64 # original size = 256
+IMG_WIDTH = 64 # original size = 256
 CHANNELS = 3 # we have full-color images
 
 
 TRAIN_FRAC = 0.90
+
+
+
+
+
+
+
+
 
 
 # Read dataset
@@ -122,25 +130,15 @@ def read_images(dataset_path, mode, batch_size):
 
 
 
-
-
-
-
-
-
-
-
-
 # Set hyperparameters
 
-learning_rate = 0.000001
-num_steps = 10000
+learning_rate = 0.0001
+num_steps = 3
 batch_size = 1000
 display_step = 1
-dropout = 0.4
+dropout = 0.5
 
 # Build the data input
-#X_train, Y_train = read_images(DATASET_PATH, MODE, batch_size)
 
 train_image, test_image, train_label, test_label, total_train_count, total_test_count = read_images(DATASET_PATH, MODE, batch_size)
 
@@ -154,179 +152,78 @@ X_test, Y_test = tf.train.batch([test_image, test_label], batch_size=total_test_
 
 print("\nDone randomly selecting %d training images and %d test images\n" % (total_train_count, total_test_count))
 
-N_DIGITS = FULL_N_CLASSES
-
-
-def incept_layer(inputlayer, filters1a, filters1b, filters2a, filters2b, filters2c, filters2d):
-        layer1a = tf.layers.conv2d(
-            inputs = inputlayer,
-            filters = filters1a,
-            kernel_size = 3,
-            strides = 1,
-            padding = "same",
-            activation=tf.tanh)
-
-        layer1b = tf.layers.conv2d(
-            inputs = inputlayer,
-            filters = filters1a,
-            kernel_size = 3,
-            strides = 1,
-            padding = "same",
-            activation=tf.tanh)
-
-        layer1c = tf.layers.max_pooling2d(
-            inputs = inputlayer,
-            pool_size = 3,
-            strides = 1,
-            padding="same")
-
-        layer2a = tf.layers.conv2d(
-            inputs = inputlayer,
-            filters = filters2a,
-            kernel_size = 3,
-            strides = 1,
-            padding = "same",
-            activation=tf.tanh)
-
-        layer2b = tf.layers.conv2d(
-            inputs = layer1a,
-            filters = filters2b,
-            kernel_size = 3,
-            strides = 1,
-            padding = "same",
-            activation=tf.tanh)
-
-        layer2c = tf.layers.conv2d(
-            inputs = layer1a,
-            filters = filters2c,
-            kernel_size = 3,
-            strides = 1,
-            padding = "same",
-            activation=tf.tanh)
-
-        layer2d = tf.layers.conv2d(
-            inputs = layer1a,
-            filters = filters2d,
-            kernel_size = 3,
-            strides = 1,
-            padding = "same",
-            activation=tf.tanh)
-
-        layerOut = tf.concat([layer2a, layer2b, layer2c, layer2d], 3)
-
-        return layerOut
-
-
-
-
-
 def conv_net(x, n_classes, dropout, reuse, is_training):
     with tf.variable_scope('ConvNet', reuse=reuse):
-
         conv1 = tf.layers.conv2d(
             inputs = x,
-            filters = 64,
-            kernel_size = 7,
-            strides = 2,
+            filters = 96, # previous: filters = 32
+            kernel_size = 11,
+            strides = (4,4),
             padding = "same",
-            activation=tf.tanh)
+            activation=tf.nn.relu)
 
-        pool2 = tf.layers.max_pooling2d(
-            inputs = conv1,
-            pool_size = 3,
-            strides = 2,
-            padding="same")
-
-        norm3 = tf.nn.local_response_normalization(
-            input = pool2,
-            depth_radius = 4,
-            bias=1.0,
-            alpha = 1.0,
-            beta = 0.5,
+        norm2 = tf.nn.local_response_normalization(
+            input = conv1,
+            depth_radius = 2,
+            bias = 1.0,
+            alpha = 0.00002,
+            beta = 0.75,
             name = None)
+
+        pool3 = tf.layers.max_pooling2d(
+            inputs = norm2,
+            pool_size = 3,
+            strides = 2)
 
         conv4 = tf.layers.conv2d(
-            inputs = norm3,
-            filters = 64,
-            kernel_size = 1,
-            strides = 1,
-            padding = "same",
-            activation=tf.tanh)
+            inputs = pool3,
+            filters = 256,
+            kernel_size = 5,
+            padding="same",
+            activation=tf.nn.relu)
 
-        conv5 = tf.layers.conv2d(
-            inputs = conv4,
-            filters = 192,
-            kernel_size = 3,
-            strides = 1,
-            padding = "same",
-            activation=tf.tanh)
-
-        norm6 = tf.nn.local_response_normalization(
-            input = conv5,
-            depth_radius = 4,
-            bias=1.0,
-            alpha = 1.0,
-            beta = 0.5,
+        norm5 = tf.nn.local_response_normalization(
+            input = conv4,
+            depth_radius = 2,
+            bias = 1.0,
+            alpha = 0.00002,
+            beta = 0.75,
             name = None)
 
-        pool7 = tf.layers.max_pooling2d(
-            inputs = norm6,
-            pool_size = 3,
-            strides = 2,
-            padding="same")
+        pool6 = tf.layers.max_pooling2d(
+            inputs = norm5,
+            pool_size = [3, 3],
+            strides = 2)
+
+        conv7 = tf.layers.conv2d(
+            inputs = pool6,
+            filters = 384,
+            kernel_size = 3,
+            padding = "same",
+            activation = tf.nn.relu)
+
+        conv8 = tf.layers.conv2d(
+            inputs = conv7,
+            filters = 384,
+            kernel_size = 3,
+            padding="same",
+            activation = tf.nn.relu)
+
+        conv9 = tf.layers.conv2d(
+            inputs = conv8,
+            filters = 384,
+            kernel_size = 3,
+            padding="same",
+            activation = tf.nn.relu)
 
 
-        # First inception module
+        flattened = tf.contrib.layers.flatten(conv9)
 
-
-
-# inputlayer, filters1a, filters1b, filters1c, filters2a, filters2b, filters2c, filters2d
-
-        incept8 = incept_layer(
-            inputlayer = pool7,
-            filters1a = 96,
-            filters1b = 16, 
-            filters2a = 64, 
-            filters2b = 128,
-            filters2c = 32,
-            filters2d = 32)
-
-        incept9 = incept_layer(incept8, 128, 32, 128, 192, 96, 64)
-
-        pool10 = tf.layers.max_pooling2d(
-            inputs = incept9,
-            pool_size = 3,
-            strides = 2,
-            padding="same")
-
-        incept11 = incept_layer(pool10, 96, 16, 192, 208, 48, 64)
-        incept12 = incept_layer(incept11, 112, 24, 160, 224, 64, 64)
-        incept13 = incept_layer(incept12, 128, 24, 128, 256, 64, 64)
-        incept14 = incept_layer(incept13, 144, 32, 112, 288, 64, 64)
-        incept15 = incept_layer(incept14, 160, 32, 256, 320, 128, 128)
-
-        pool16 = tf.layers.max_pooling2d(
-            inputs = incept15,
-            pool_size = 3,
-            strides = 2,
-            padding = "same")
-
-        incept17 = incept_layer(pool16, 160, 32, 256, 320, 128, 128)
-        incept18 = incept_layer(incept17, 192, 48, 384, 384, 128, 128)
-
-        finalPool = tf.layers.average_pooling2d(
-            inputs = incept18,
-            pool_size = 7,
-            strides = 1,
-            padding = "same")
-
-        flattened = tf.contrib.layers.flatten(finalPool)
-
-        connected = tf.layers.dense(
-            inputs = flattened,
-            units = 1000)
-
-        out = tf.layers.dense(connected, n_classes)
+        fc10 = tf.layers.dense(flattened, 1024)
+        fc10 = tf.layers.dropout(fc10, rate=dropout, training=is_training)
+        fc11 = tf.layers.dense(fc10, 1024)
+        fc11 = tf.layers.dropout(fc10, rate=dropout, training=is_training)
+        out = tf.layers.dense(fc11, n_classes)
         out = tf.nn.softmax(out) if not is_training else out
     return out
 
@@ -353,12 +250,13 @@ saver = tf.train.Saver()
 
 
 with tf.Session() as sess:
-
+    saver.restore(sess, "/tmp/test_deep_save/model.ckpt")
     # Run the initializer
     sess.run(init)
 
     # Start the data queue
-    tf.train.start_queue_runners()
+    coord = tf.train.Coordinator()
+    threads = tf.train.start_queue_runners(coord=coord)
 
     # Training cycle
     for step in range(1, num_steps+1):
@@ -373,5 +271,12 @@ with tf.Session() as sess:
         else:
             # Only run the optimization op (backprop)
             sess.run(train_op)
+    coord.request_stop()
+    coord.join(threads)
 
     print("Optimization Finished!")
+
+    # Save your model
+    save_path = saver.save(sess, "/tmp/test_deep_save/model.ckpt")
+    print("Model saved in path: %s" % save_path)
+    # saver.save(sess, '/home/mathew/models/AlexNet_model')

@@ -250,10 +250,9 @@ saver = tf.train.Saver()
 
 
 with tf.Session() as sess:
-    saver.restore(sess, "/tmp/test_deep_save/model.ckpt")
     # Run the initializer
     sess.run(init)
-
+    
     # Start the data queue
     coord = tf.train.Coordinator()
     threads = tf.train.start_queue_runners(coord=coord)
@@ -276,7 +275,5 @@ with tf.Session() as sess:
 
     print("Optimization Finished!")
 
-    # Save your model
-    save_path = saver.save(sess, "/tmp/test_deep_save/model.ckpt")
-    print("Model saved in path: %s" % save_path)
-    # saver.save(sess, '/home/mathew/models/AlexNet_model')
+    # Save model
+    saver.save(sess, "my_test_model", global_step=1)

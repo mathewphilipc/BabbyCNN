@@ -132,9 +132,9 @@ def read_images(dataset_path, mode, batch_size):
 
 # Set hyperparameters
 
-learning_rate = 0.0001
-num_steps = 2
-batch_size = 10
+learning_rate = 0.00003
+num_steps = 10
+batch_size = 1000
 display_step = 1
 dropout = 0.5
 
@@ -151,6 +151,7 @@ X_test, Y_test = tf.train.batch([test_image, test_label], batch_size=total_test_
 
 
 print("\nDone randomly selecting %d training images and %d test images\n" % (total_train_count, total_test_count))
+
 
 def conv_net(x, n_classes, dropout, reuse, is_training):
     with tf.variable_scope('ConvNet', reuse=reuse):
@@ -249,11 +250,26 @@ init = tf.global_variables_initializer()
 saver = tf.train.Saver()
 
 
+
+# Comment the next line of code for initial train sessions
+# Uncomment for subsequent
+imported_meta = tf.train.import_meta_graph("/tmp/model.ckpt.meta")
+
+
 with tf.Session() as sess:
     # Run the initializer
-    sess.run(init)
- 
-   # Start the data queue
+
+
+    # Comment the next line of code for initial train sessions
+    # Uncomment for subsequent
+    imported_meta.restore(sess, tf.train.latest_checkpoint('/tmp'))
+
+    # Reverse instructions apply to this line:
+    # sess.run(init)
+
+
+
+    #Start the data queue
     coord = tf.train.Coordinator()
     threads = tf.train.start_queue_runners(coord=coord)
 
@@ -279,6 +295,8 @@ with tf.Session() as sess:
 
     save_path = saver.save(sess, "/tmp/model.ckpt")
     print("Model saved in path: %s" % save_path)
+
+
 
     # https://www.tensorflow.org/programmers_guide/saved_model
     # http://cv-tricks.com/tensorflow-tutorial/save-restore-tensorflow-models-quick-complete-tutorial/

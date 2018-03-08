@@ -10,6 +10,8 @@ import numpy as np
 # Toggle this to False if you're continuing from previous training
 FIRST_TRAINING_SESSION = False
 
+MODEL_PATH = "/home/mathew/NWPU_Models/AlexNet/"
+
 MINI_OR_FULL = "MINI"
 MINI_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45-MINI"
 FULL_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45"
@@ -135,7 +137,7 @@ def read_images(dataset_path, mode, batch_size):
 # Set hyperparameters
 
 learning_rate = 0.0001
-num_steps = 5
+num_steps = 2
 batch_size = 1000
 display_step = 1
 dropout = 0.5
@@ -249,21 +251,17 @@ train_accuracy = tf.reduce_mean(tf.cast(correct_train_pred, tf.float32))
 init = tf.global_variables_initializer()
 
 saver = tf.train.Saver()
-# Comment the next line of code for initial train sessions
-# Uncomment for subsequent
-imported_meta = tf.train.import_meta_graph("/tmp/model.ckpt.meta")
+
+if not FIRST_TRAINING_SESSION:
+    imported_meta = tf.train.import_meta_graph(MODEL_PATH + "model.ckpt.meta")
 
 
 with tf.Session() as sess:
-    # Run the initializer
 
-
-    # Comment the next line of code for initial train sessions
-    # Uncomment for subsequent
-    imported_meta.restore(sess, tf.train.latest_checkpoint('/tmp'))
-
-    # Reverse instructions apply to this line:
-    # sess.run(init)
+    if FIRST_TRAINING_SESSION:
+        sess.run(init)
+    else:
+        imported_meta.restore(sess, tf.train.latest_checkpoint(MODEL_PATH))
 
 
 
@@ -291,6 +289,5 @@ with tf.Session() as sess:
 
     # Save model
 
-    save_path = saver.save(sess, "/tmp/model.ckpt")
+    save_path = saver.save(sess, MODEL_PATH + "model.ckpt")
     print("Model saved in path: %s" % save_path)
-

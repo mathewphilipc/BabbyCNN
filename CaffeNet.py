@@ -10,6 +10,9 @@ import numpy as np
 # Toggle this to False if you're continuing from previous training
 FIRST_TRAINING_SESSION = False
 
+MODEL_PATH = "/home/mathew/NWPU_Models/CaffeNet/"
+
+
 MINI_OR_FULL = "MINI"
 MINI_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45-MINI"
 FULL_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45"
@@ -248,20 +251,17 @@ init = tf.global_variables_initializer()
 
 saver = tf.train.Saver()
 
-# Comment the next line of code for initial train sessions
-# Uncomment for subsequent
 
 if not FIRST_TRAINING_SESSION:
-    imported_meta = tf.train.import_meta_graph("/tmp/model.ckpt.meta")
+    imported_meta = tf.train.import_meta_graph(MODEL_PATH + "model.ckpt.meta")
 
 
 with tf.Session() as sess:
-    # Run the initializer
 
     if FIRST_TRAINING_SESSION:
         sess.run(init)
     else:
-        imported_meta.restore(sess, tf.train.latest_checkpoint('/tmp'))
+        imported_meta.restore(sess, tf.train.latest_checkpoint(MODEL_PATH))
 
 
 
@@ -289,5 +289,5 @@ with tf.Session() as sess:
 
     # Save model
 
-    save_path = saver.save(sess, "/tmp/model.ckpt")
+    save_path = saver.save(sess, MODEL_PATH + "model.ckpt")
     print("Model saved in path: %s" % save_path)

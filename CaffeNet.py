@@ -7,6 +7,8 @@ import tensorflow as tf
 import os
 import numpy as np
 
+# Toggle this to False if you're continuing from previous training
+FIRST_TRAINING_SESSION = False
 
 MINI_OR_FULL = "MINI"
 MINI_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45-MINI"
@@ -146,7 +148,7 @@ def read_images(dataset_path, mode, batch_size):
 # Set hyperparameters
 
 learning_rate = 0.0001
-num_steps = 100000
+num_steps = 5
 batch_size = 1000
 display_step = 1
 dropout = 0.5
@@ -262,14 +264,34 @@ init = tf.global_variables_initializer()
 
 saver = tf.train.Saver()
 
+# Comment the next line of code for initial train sessions
+# Uncomment for subsequent
+
+if not FIRST_TRAINING_SESSION:
+    imported_meta = tf.train.import_meta_graph("/tmp/model.ckpt.meta")
+
 
 with tf.Session() as sess:
-
     # Run the initializer
-    sess.run(init)
 
-    # Start the data queue
-    tf.train.start_queue_runners()
+    if FIRST_TRAINING_SESSION:
+        sess.run(init)
+    else:
+        imported_meta.restore(sess, tf.train.latest_checkpoint('/tmp'))
+
+
+    # Comment the next line of code for initial train sessions
+    # Uncomment for subsequent
+    # imported_meta.restore(sess, tf.train.latest_checkpoint('/tmp'))
+
+    # Reverse instructions apply to this line:
+    # sess.run(init)
+
+
+
+    #Start the data queue
+    coord = tf.train.Coordinator()
+    threads = tf.train.start_queue_runners(coord=coord)
 
     # Training cycle
     for step in range(1, num_steps+1):
@@ -284,9 +306,12 @@ with tf.Session() as sess:
         else:
             # Only run the optimization op (backprop)
             sess.run(train_op)
+    coord.request_stop()
+    coord.join(threads)
 
     print("Optimization Finished!")
 
-    # Save your model
-    # saver.save(sess, 'my_tf_model')
-    #saver.save(sess, '/home/mathew/models/CaffeNet_model')
+    # Save model
+
+    save_path = saver.save(sess, "/tmp/model.ckpt")
+    print("Model saved in path: %s" % save_path)

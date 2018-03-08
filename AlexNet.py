@@ -7,6 +7,8 @@ import tensorflow as tf
 import os
 import numpy as np
 
+# Toggle this to False if you're continuing from previous training
+FIRST_TRAINING_SESSION = False
 
 MINI_OR_FULL = "MINI"
 MINI_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45-MINI"

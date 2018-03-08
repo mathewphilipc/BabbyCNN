@@ -119,22 +119,6 @@ def read_images(dataset_path, mode, batch_size):
 
     return train_image, test_image, train_label, test_label, total_train_count, total_test_count
 
-#    X_train, Y_train = tf.train.batch([train_image, train_label], batch_size=batch_size,
-#                          capacity=batch_size * 8,
-#                          num_threads=4)
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -278,14 +262,6 @@ with tf.Session() as sess:
         sess.run(init)
     else:
         imported_meta.restore(sess, tf.train.latest_checkpoint('/tmp'))
-
-
-    # Comment the next line of code for initial train sessions
-    # Uncomment for subsequent
-    # imported_meta.restore(sess, tf.train.latest_checkpoint('/tmp'))
-
-    # Reverse instructions apply to this line:
-    # sess.run(init)
 
 
 

@@ -7,6 +7,11 @@ import tensorflow as tf
 import os
 import numpy as np
 
+# Toggle this to False if you're continuing from previous training
+FIRST_TRAINING_SESSION = True
+
+MODEL_PATH = "/home/mathew/NWPU_Models/ResNet/"
+
 
 MINI_OR_FULL = "MINI"
 MINI_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45-MINI"
@@ -85,13 +90,6 @@ def read_images(dataset_path, mode, batch_size):
     else:
         raise Exception("Unknown mode.")
 
-#    print("\n\n****************************************")
-#    print("Total training images: %d" % total_train_count)
-#    print("Total testing images: %d" % total_test_count)
-#    portion = 100.0*(total_train_count + 0.0) / (total_train_count + total_test_count + 0.0)
-#    print("Portion used for training: %f " % portion)
-#    print("****************************************\n\n")
-
     # Convert to Tensor
     train_imagepaths = tf.convert_to_tensor(train_imagepaths, dtype=tf.string)
     train_labels = tf.convert_to_tensor(train_labels, dtype=tf.int32)
@@ -123,16 +121,11 @@ def read_images(dataset_path, mode, batch_size):
 
     return train_image, test_image, train_label, test_label, total_train_count, total_test_count
 
-#    X_train, Y_train = tf.train.batch([train_image, train_label], batch_size=batch_size,
-#                          capacity=batch_size * 8,
-#                          num_threads=4)
-
-
 
 # Set hyperparameters
 
 learning_rate = 0.0003
-num_steps = 10000
+num_steps = 5
 batch_size = 1000
 display_step = 1
 dropout = 0.0
@@ -436,13 +429,22 @@ init = tf.global_variables_initializer()
 saver = tf.train.Saver()
 
 
+if not FIRST_TRAINING_SESSION:
+    imported_meta = tf.train.import_meta_graph(MODEL_PATH + "model.ckpt.meta")
+
+
 with tf.Session() as sess:
 
-    # Run the initializer
-    sess.run(init)
+    if FIRST_TRAINING_SESSION:
+        sess.run(init)
+    else:
+        imported_meta.restore(sess, tf.train.latest_checkpoint(MODEL_PATH))
 
-    # Start the data queue
-    tf.train.start_queue_runners()
+
+
+    #Start the data queue
+    coord = tf.train.Coordinator()
+    threads = tf.train.start_queue_runners(coord=coord)
 
     # Training cycle
     for step in range(1, num_steps+1):
@@ -457,5 +459,12 @@ with tf.Session() as sess:
         else:
             # Only run the optimization op (backprop)
             sess.run(train_op)
+    coord.request_stop()
+    coord.join(threads)
 
     print("Optimization Finished!")
+
+    # Save model
+
+    save_path = saver.save(sess, MODEL_PATH + "model.ckpt")
+    print("Model saved in path: %s" % save_path)

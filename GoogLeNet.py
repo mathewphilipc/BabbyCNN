@@ -7,6 +7,11 @@ import tensorflow as tf
 import os
 import numpy as np
 
+# Toggle this to False if you're continuing from previous training
+FIRST_TRAINING_SESSION = True
+
+MODEL_PATH = "/home/mathew/NWPU_Models/GoogleNet/"
+
 
 MINI_OR_FULL = "MINI"
 MINI_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45-MINI"
@@ -134,7 +139,7 @@ def read_images(dataset_path, mode, batch_size):
 # Set hyperparameters
 
 learning_rate = 0.000001
-num_steps = 10000
+num_steps = 2
 batch_size = 1000
 display_step = 1
 dropout = 0.4
@@ -352,13 +357,22 @@ init = tf.global_variables_initializer()
 saver = tf.train.Saver()
 
 
+if not FIRST_TRAINING_SESSION:
+    imported_meta = tf.train.import_meta_graph(MODEL_PATH + "model.ckpt.meta")
+
+
 with tf.Session() as sess:
 
-    # Run the initializer
-    sess.run(init)
+    if FIRST_TRAINING_SESSION:
+        sess.run(init)
+    else:
+        imported_meta.restore(sess, tf.train.latest_checkpoint(MODEL_PATH))
 
-    # Start the data queue
-    tf.train.start_queue_runners()
+
+
+    #Start the data queue
+    coord = tf.train.Coordinator()
+    threads = tf.train.start_queue_runners(coord=coord)
 
     # Training cycle
     for step in range(1, num_steps+1):
@@ -373,5 +387,12 @@ with tf.Session() as sess:
         else:
             # Only run the optimization op (backprop)
             sess.run(train_op)
+    coord.request_stop()
+    coord.join(threads)
 
     print("Optimization Finished!")
+
+    # Save model
+
+    save_path = saver.save(sess, MODEL_PATH + "model.ckpt")
+    print("Model saved in path: %s" % save_path)

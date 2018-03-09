@@ -12,7 +12,7 @@ FIRST_TRAINING_SESSION = False
 
 MODEL_PATH = "/home/mathew/NWPU_Models/AlexNet/"
 
-MINI_OR_FULL = "MINI"
+MINI_OR_FULL = "FULL"
 MINI_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45-MINI"
 FULL_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45"
 
@@ -137,7 +137,7 @@ def read_images(dataset_path, mode, batch_size):
 # Set hyperparameters
 
 learning_rate = 0.0001
-num_steps = 2
+num_steps = 5
 batch_size = 1000
 display_step = 1
 dropout = 0.5

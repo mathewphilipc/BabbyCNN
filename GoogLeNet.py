@@ -8,7 +8,7 @@ import os
 import numpy as np
 
 # Toggle this to False if you're continuing from previous training
-FIRST_TRAINING_SESSION = True
+FIRST_TRAINING_SESSION = False
 
 MODEL_PATH = "/home/mathew/NWPU_Models/GoogleNet/"
 
@@ -27,8 +27,8 @@ N_CLASSES = FULL_N_CLASSES
 
 # print(N_CLASSES)
 
-IMG_HEIGHT = 32 # original size = 256
-IMG_WIDTH = 32 # original size = 256
+IMG_HEIGHT = 64 # original size = 256
+IMG_WIDTH = 64 # original size = 256
 CHANNELS = 3 # we have full-color images
 
 

@@ -162,7 +162,7 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
             inputs = x,
             filters = 96, # previous: filters = 32
             kernel_size = 11,
-            strides = (4,4),
+            strides = 4,
             padding = "same",
             activation=tf.nn.relu)
 
@@ -196,8 +196,12 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
 
         pool6 = tf.layers.max_pooling2d(
             inputs = norm5,
-            pool_size = [3, 3],
+            pool_size = 3,
             strides = 2)
+
+
+
+
 
         conv7 = tf.layers.conv2d(
             inputs = pool6,
@@ -215,18 +219,26 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
 
         conv9 = tf.layers.conv2d(
             inputs = conv8,
-            filters = 384,
+            filters = 256,
             kernel_size = 3,
             padding="same",
             activation = tf.nn.relu)
+
+
+
+
 
 
         flattened = tf.contrib.layers.flatten(conv9)
 
         fc10 = tf.layers.dense(flattened, 1024)
         fc10 = tf.layers.dropout(fc10, rate=dropout, training=is_training)
+        fc10 = tf.nn.relu(fc10)
+
         fc11 = tf.layers.dense(fc10, 1024)
         fc11 = tf.layers.dropout(fc10, rate=dropout, training=is_training)
+        fc11 = tf.nn.relu(fc11)
+
         out = tf.layers.dense(fc11, n_classes)
         out = tf.nn.softmax(out) if not is_training else out
     return out

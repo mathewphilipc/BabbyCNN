@@ -147,6 +147,12 @@ dropout = 0.5
 
 
 train_image, test_image, train_label, test_label, total_train_count, total_test_count = read_images(DATASET_PATH, MODE, batch_size)
+test_batch_size = total_test_count // 10
+
+
+
+
+
 
 X_train, Y_train = tf.train.batch([train_image, train_label], batch_size=batch_size,
     capacity=batch_size * 8, num_threads=4)

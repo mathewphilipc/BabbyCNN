@@ -31,11 +31,13 @@ IMG_WIDTH = 64 # original size = 256
 CHANNELS = 3 # we have full-color images
 
 
-TRAIN_FRAC = 0.999
+TRAIN_FRAC = 0.99
 
 
 # For deterministic, consistent train/test splitting across runs
 np.random.seed(0)
+
+
 
 
 
@@ -89,7 +91,7 @@ def read_images(dataset_path, mode, batch_size):
                         test_imagepaths.append(os.path.join(c_dir, sample))
                         test_labels.append(label)
                         total_test_count += 1
-                        print("New test image: {}".format(sample))
+                        # print("New test image: {}".format(sample))
 
                     else:
                         train_imagepaths.append(os.path.join(c_dir, sample))
@@ -141,20 +143,24 @@ def read_images(dataset_path, mode, batch_size):
 # Set hyperparameters
 
 learning_rate = 0.0001
-num_steps = 2
-batch_size = 5
+num_steps = 20
+batch_size = 100
 display_step = 1
 dropout = 0.5
+
 
 # Build the data input
 
 train_image, test_image, train_label, test_label, total_train_count, total_test_count = read_images(DATASET_PATH, MODE, batch_size)
+test_batch_size = total_test_count // 10
+
+
 
 X_train, Y_train = tf.train.batch([train_image, train_label], batch_size=batch_size,
     capacity=batch_size * 8, num_threads=4)
 
 # Use entire testing set for every accuracy check
-X_test, Y_test = tf.train.batch([test_image, test_label], batch_size=total_test_count,
+X_test, Y_test = tf.train.batch([test_image, test_label], batch_size = test_batch_size,
     capacity=batch_size * 8, num_threads=4)
 
 

@@ -26,13 +26,16 @@ N_CLASSES = FULL_N_CLASSES
 
 # print(N_CLASSES)
 
-IMG_HEIGHT = 150 # original size = 256
-IMG_WIDTH = 150 # original size = 256
+IMG_HEIGHT = 64 # original size = 256
+IMG_WIDTH = 64 # original size = 256
 CHANNELS = 3 # we have full-color images
 
 
-TRAIN_FRAC = 0.95
+TRAIN_FRAC = 0.999
 
+
+# For deterministic, consistent train/test splitting across runs
+np.random.seed(0)
 
 
 
@@ -86,6 +89,7 @@ def read_images(dataset_path, mode, batch_size):
                         test_imagepaths.append(os.path.join(c_dir, sample))
                         test_labels.append(label)
                         total_test_count += 1
+                        print("New test image: {}".format(sample))
 
                     else:
                         train_imagepaths.append(os.path.join(c_dir, sample))

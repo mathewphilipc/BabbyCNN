@@ -33,6 +33,8 @@ CHANNELS = 3 # we have full-color images
 
 
 TRAIN_FRAC = 0.90
+# For deterministic, consistent train/test splitting across runs
+np.random.seed(0)
 
 
 # Read dataset

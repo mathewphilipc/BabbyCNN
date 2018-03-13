@@ -91,7 +91,7 @@ def read_images(dataset_path, mode, batch_size):
                         test_imagepaths.append(os.path.join(c_dir, sample))
                         test_labels.append(label)
                         total_test_count += 1
-                        # print("New test image: {}".format(sample))
+                        print("New test image: {}".format(sample))
 
                     else:
                         train_imagepaths.append(os.path.join(c_dir, sample))
@@ -143,7 +143,7 @@ def read_images(dataset_path, mode, batch_size):
 # Set hyperparameters
 
 learning_rate = 0.0001
-num_steps = 20
+num_steps = 2
 batch_size = 100
 display_step = 1
 dropout = 0.5

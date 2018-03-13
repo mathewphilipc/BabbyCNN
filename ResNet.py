@@ -11,11 +11,14 @@ import numpy as np
 FIRST_TRAINING_SESSION = True
 
 MODEL_PATH = "/home/mathew/NWPU_Models/ResNet/"
+#MODEL_PATH = "/home/ubuntu/NWPU_Models/ResNet/"
 
 
 MINI_OR_FULL = "MINI"
 MINI_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45-MINI"
+#MINI_DATASET_PATH = "/home/ubuntu/data/NWPU-RESISC45-MINI"
 FULL_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45"
+#FULL_DATASET_PATH = "/home/ubuntu/data/Desktop/NWPU-RESISC45"
 
 
 MODE = 'folder'
@@ -32,7 +35,7 @@ IMG_WIDTH = 64 # original size = 256
 CHANNELS = 3 # we have full-color images
 
 
-TRAIN_FRAC = 0.90
+TRAIN_FRAC = 0.95
 
 # For deterministic, consistent train/test splitting across runs
 np.random.seed(0)
@@ -136,6 +139,7 @@ dropout = 0.0
 # Build the data input
 
 train_image, test_image, train_label, test_label, total_train_count, total_test_count = read_images(DATASET_PATH, MODE, batch_size)
+
 test_batch_size = total_test_count // 10
 
 

@@ -8,7 +8,7 @@ import os
 import numpy as np
 
 # Toggle this to False if you're continuing from previous training
-FIRST_TRAINING_SESSION = False
+FIRST_TRAINING_SESSION = True
 
 MODEL_PATH = "/home/mathew/NWPU_Models/GoogleNet/"
 
@@ -27,8 +27,8 @@ N_CLASSES = FULL_N_CLASSES
 
 # print(N_CLASSES)
 
-IMG_HEIGHT = 64 # original size = 256
-IMG_WIDTH = 64 # original size = 256
+IMG_HEIGHT = 128 # original size = 256
+IMG_WIDTH = 128 # original size = 256
 CHANNELS = 3 # we have full-color images
 
 
@@ -141,9 +141,9 @@ def read_images(dataset_path, mode, batch_size):
 
 # Set hyperparameters
 
-learning_rate = 0.000001
-num_steps = 2
-batch_size = 1000
+learning_rate = 0.001
+num_steps = 1
+batch_size = 3
 display_step = 1
 dropout = 0.4
 
@@ -151,7 +151,7 @@ dropout = 0.4
 #X_train, Y_train = read_images(DATASET_PATH, MODE, batch_size)
 
 train_image, test_image, train_label, test_label, total_train_count, total_test_count = read_images(DATASET_PATH, MODE, batch_size)
-test_batch_size = total_test_count // 10
+test_batch_size = total_test_count // 50
 
 
 
@@ -290,9 +290,6 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
 
         # First inception module
 
-
-
-# inputlayer, filters1a, filters1b, filters1c, filters2a, filters2b, filters2c, filters2d
 
         incept8 = incept_layer(
             inputlayer = pool7,

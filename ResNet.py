@@ -18,7 +18,7 @@ MINI_OR_FULL = "MINI"
 MINI_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45-MINI"
 #MINI_DATASET_PATH = "/home/ubuntu/data/NWPU-RESISC45-MINI"
 FULL_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45"
-#FULL_DATASET_PATH = "/home/ubuntu/data/Desktop/NWPU-RESISC45"
+#FULL_DATASET_PATH = "/home/ubuntu/data/NWPU-RESISC45"
 
 
 MODE = 'folder'
@@ -149,9 +149,8 @@ X_train, Y_train = tf.train.batch([train_image, train_label], batch_size=batch_s
     capacity=batch_size * 8, num_threads=4)
 
 # Use entire testing set for every accuracy check
-X_test, Y_test = tf.train.batch([test_image, test_label], batch_size=total_test_count,
+X_test, Y_test = tf.train.batch([test_image, test_label], batch_size = test_batch_size,
     capacity=batch_size * 8, num_threads=4)
-
 
 print("\nDone randomly selecting %d training images and %d test images\n" % (total_train_count, total_test_count))
 

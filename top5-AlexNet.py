@@ -276,8 +276,8 @@ train_accuracy = tf.reduce_mean(tf.cast(correct_train_pred, tf.float32))
 #topfive_accuracy = tf.nn.in_top_k(logits_test, Y_test, 5)
 #topfive_accuracy = tf.metrics.mean(topfive_accuracy)
 #topfive_accuracy = tf.reduce_sum(tf.cast(topfive_accuracy, tf.int32))
-topfive_accuracy = tf.reduce_sum(tf.cast(tf.nn.in_top_k(logits_test, Y_test, 5), tf.int32)) / test_batch_size
-topthree_accuracy = tf.reduce_sum(tf.cast(tf.nn.in_top_k(logits_test, Y_test, 3), tf.int32)) / test_batch_size
+topfive_accuracy = tf.reduce_mean(tf.cast(tf.nn.in_top_k(logits_test, Y_test, 5), tf.float32))
+topthree_accuracy = tf.reduce_sum(tf.cast(tf.nn.in_top_k(logits_test, Y_test, 3), tf.float32))
 
 
 init = tf.global_variables_initializer()

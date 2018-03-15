@@ -310,7 +310,8 @@ with tf.Session() as sess:
             print("Step " + str(step) + ", Minibatch Loss= " + \
                   "{:.4f}".format(loss) + ", Train Acc " + \
                   "{:.3f}".format(train_acc) + ", Test Acc = " + \
-                  "{:.3f}".format(train_acc) + ", Top-5 Test Acc = " + \
+                  "{:.3f}".format(test_acc) + ", Top-3 Test Acc = " + \
+                  "{:.3f}".format(topthree_acc) + ", Top-5 Test Acc = " + \
                   "{:.3f}".format(topfive_acc))
         else:
             # Only run the optimization op (backprop)

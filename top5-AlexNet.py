@@ -2,6 +2,7 @@
 # blob/master/examples/5_DataManagement/build_an_image_dataset.py
 
 from __future__ import print_function
+from __future__ import division
 
 import tensorflow as tf
 import os
@@ -160,7 +161,7 @@ test_batch_size = total_test_count // 10
 X_train, Y_train = tf.train.batch([train_image, train_label], batch_size=batch_size,
     capacity=batch_size * 8, num_threads=4)
 
-# Use entire testing set for every accuracy check
+# Use partial testing set for every accuracy check
 X_test, Y_test = tf.train.batch([test_image, test_label], batch_size = test_batch_size,
     capacity=batch_size * 8, num_threads=4)
 
@@ -254,6 +255,8 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
 #        out = tf.nn.softmax(out) if not is_training else out
         if not is_training:
             out = tf.nn.softmax(out)
+#            out = tf.metrics.mean(tf.nn.in_top_k(predictions=out, ))
+#            out = tf.nn.softmax(out)
     return out
 
 logits_train = conv_net(X_train, N_CLASSES, dropout, reuse=False, is_training=True)
@@ -270,7 +273,11 @@ test_accuracy = tf.reduce_mean(tf.cast(correct_test_pred, tf.float32))
 correct_train_pred = tf.equal(tf.argmax(logits_train, 1), tf.cast(Y_train, tf.int64))
 train_accuracy = tf.reduce_mean(tf.cast(correct_train_pred, tf.float32))
 
-
+#topfive_accuracy = tf.nn.in_top_k(logits_test, Y_test, 5)
+#topfive_accuracy = tf.metrics.mean(topfive_accuracy)
+#topfive_accuracy = tf.reduce_sum(tf.cast(topfive_accuracy, tf.int32))
+topfive_accuracy = tf.reduce_sum(tf.cast(tf.nn.in_top_k(logits_test, Y_test, 5), tf.int32)) / test_batch_size
+topthree_accuracy = tf.reduce_sum(tf.cast(tf.nn.in_top_k(logits_test, Y_test, 3), tf.int32)) / test_batch_size
 
 
 init = tf.global_variables_initializer()
@@ -299,11 +306,12 @@ with tf.Session() as sess:
 
         if step % display_step == 0:
             # Run optimization and calculate batch loss and accuracy
-            _, loss, test_acc, train_acc = sess.run([train_op, loss_op, test_accuracy, train_accuracy])
+            _, loss, test_acc, train_acc, topfive_acc, topthree_acc = sess.run([train_op, loss_op, test_accuracy, train_accuracy, topfive_accuracy, topthree_accuracy])
             print("Step " + str(step) + ", Minibatch Loss= " + \
                   "{:.4f}".format(loss) + ", Train Acc " + \
                   "{:.3f}".format(train_acc) + ", Test Acc = " + \
-                  "{:.3f}".format(test_acc))
+                  "{:.3f}".format(train_acc) + ", Top-5 Test Acc = " + \
+                  "{:.3f}".format(topfive_acc))
         else:
             # Only run the optimization op (backprop)
             sess.run(train_op)

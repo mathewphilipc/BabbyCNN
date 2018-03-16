@@ -11,7 +11,7 @@ import numpy as np
 # Toggle this to False if you're continuing from previous training
 FIRST_TRAINING_SESSION = True
 
-MODEL_PATH = "/home/mathew/NWPU_Models/ResNet/"
+MODEL_PATH = "/home/mathew/NWPU_Models/AlexNet/"
 #MODEL_PATH = "/home/ubuntu/NWPU_Models/ResNet/"
 MINI_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45-MINI"
 #MINI_DATASET_PATH = "/home/ubuntu/data/NWPU-RESISC45-MINI"
@@ -83,7 +83,6 @@ def read_images(dataset_path, mode, batch_size):
                         test_imagepaths.append(os.path.join(c_dir, sample))
                         test_labels.append(label)
                         total_test_count += 1
-                        print("New test image: {}".format(sample))
 
                     else:
                         train_imagepaths.append(os.path.join(c_dir, sample))
@@ -91,7 +90,6 @@ def read_images(dataset_path, mode, batch_size):
                         total_train_count += 1
                     image_count += 1
             label += 1
-            #print("Just added image number %d" % label)
     else:
         raise Exception("Unknown mode.")
 
@@ -135,8 +133,8 @@ def read_images(dataset_path, mode, batch_size):
 # Set hyperparameters
 
 learning_rate = 0.0001
-num_steps = 2
-batch_size = 100
+num_steps = 50
+batch_size = 200
 display_step = 1
 dropout = 0.5
 
@@ -144,6 +142,7 @@ dropout = 0.5
 # Build the data input
 
 train_image, test_image, train_label, test_label, total_train_count, total_test_count = read_images(DATASET_PATH, MODE, batch_size)
+
 test_batch_size = total_test_count // 10
 
 
@@ -202,9 +201,6 @@ def conv_net(x, n_classes, dropout, reuse, is_training):
             strides = 2)
 
 
-
-
-
         conv7 = tf.layers.conv2d(
             inputs = pool6,
             filters = 384,
@@ -259,6 +255,9 @@ test_accuracy = tf.reduce_mean(tf.cast(correct_test_pred, tf.float32))
 correct_train_pred = tf.equal(tf.argmax(logits_train, 1), tf.cast(Y_train, tf.int64))
 train_accuracy = tf.reduce_mean(tf.cast(correct_train_pred, tf.float32))
 
+topfive_accuracy = tf.reduce_mean(tf.cast(tf.nn.in_top_k(logits_test, Y_test, 5), tf.float32))
+#topthree_accuracy = tf.reduce_mean(tf.cast(tf.nn.in_top_k(logits_test, Y_test, 3), tf.float32))
+
 
 
 
@@ -288,11 +287,11 @@ with tf.Session() as sess:
 
         if step % display_step == 0:
             # Run optimization and calculate batch loss and accuracy
-            _, loss, test_acc, train_acc = sess.run([train_op, loss_op, test_accuracy, train_accuracy])
+            _, loss, test_acc, topfive_acc = sess.run([train_op, loss_op, test_accuracy, topfive_accuracy])
             print("Step " + str(step) + ", Minibatch Loss= " + \
-                  "{:.4f}".format(loss) + ", Train Acc " + \
-                  "{:.3f}".format(train_acc) + ", Test Acc = " + \
-                  "{:.3f}".format(test_acc))
+                  "{:.4f}".format(loss) + ", Test Acc " + \
+                  "{:.3f}".format(test_acc) + ", Top-5 Test Acc = " + \
+                  "{:.3f}".format(topfive_acc))
         else:
             # Only run the optimization op (backprop)
             sess.run(train_op)

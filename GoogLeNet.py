@@ -11,7 +11,7 @@ import numpy as np
 # Toggle this to False if you're continuing from previous training
 FIRST_TRAINING_SESSION = True
 
-MODEL_PATH = "/home/mathew/NWPU_Models/ResNet/"
+MODEL_PATH = "/home/mathew/NWPU_Models/GoogLeNet/"
 #MODEL_PATH = "/home/ubuntu/NWPU_Models/ResNet/"
 MINI_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45-MINI"
 #MINI_DATASET_PATH = "/home/ubuntu/data/NWPU-RESISC45-MINI"
@@ -28,8 +28,8 @@ N_CLASSES = FULL_N_CLASSES
 
 # print(N_CLASSES)
 
-IMG_HEIGHT = 128 # original size = 256
-IMG_WIDTH = 128 # original size = 256
+IMG_HEIGHT = 32 # original size = 256
+IMG_WIDTH = 32 # original size = 256
 CHANNELS = 3 # we have full-color images
 
 
@@ -142,9 +142,9 @@ def read_images(dataset_path, mode, batch_size):
 
 # Set hyperparameters
 
-learning_rate = 0.001
-num_steps = 1
-batch_size = 3
+learning_rate = 0.0001
+num_steps = 100
+batch_size = 100
 display_step = 1
 dropout = 0.4
 
@@ -152,6 +152,7 @@ dropout = 0.4
 #X_train, Y_train = read_images(DATASET_PATH, MODE, batch_size)
 
 train_image, test_image, train_label, test_label, total_train_count, total_test_count = read_images(DATASET_PATH, MODE, batch_size)
+
 test_batch_size = total_test_count // 50
 
 
@@ -161,7 +162,7 @@ X_train, Y_train = tf.train.batch([train_image, train_label], batch_size=batch_s
     capacity=batch_size * 8, num_threads=4)
 
 # Use entire testing set for every accuracy check
-X_test, Y_test = tf.train.batch([test_image, test_label], batch_size=total_test_count,
+X_test, Y_test = tf.train.batch([test_image, test_label], batch_size=test_batch_size,
     capacity=batch_size * 8, num_threads=4)
 
 
@@ -354,6 +355,9 @@ test_accuracy = tf.reduce_mean(tf.cast(correct_test_pred, tf.float32))
 correct_train_pred = tf.equal(tf.argmax(logits_train, 1), tf.cast(Y_train, tf.int64))
 train_accuracy = tf.reduce_mean(tf.cast(correct_train_pred, tf.float32))
 
+topfive_accuracy = tf.reduce_mean(tf.cast(tf.nn.in_top_k(logits_test, Y_test, 5), tf.float32))
+#topthree_accuracy = tf.reduce_mean(tf.cast(tf.nn.in_top_k(logits_test, Y_test, 3), tf.float32))
+
 
 
 
@@ -384,11 +388,11 @@ with tf.Session() as sess:
 
         if step % display_step == 0:
             # Run optimization and calculate batch loss and accuracy
-            _, loss, test_acc, train_acc = sess.run([train_op, loss_op, test_accuracy, train_accuracy])
+            _, loss, test_acc, topfive_acc = sess.run([train_op, loss_op, test_accuracy, topfive_accuracy])
             print("Step " + str(step) + ", Minibatch Loss= " + \
-                  "{:.4f}".format(loss) + ", Train Acc " + \
-                  "{:.3f}".format(train_acc) + ", Test Acc = " + \
-                  "{:.3f}".format(test_acc))
+                  "{:.4f}".format(loss) + ", Test Acc " + \
+                  "{:.3f}".format(test_acc) + ", Top-5 Test Acc = " + \
+                  "{:.3f}".format(topfive_acc))
         else:
             # Only run the optimization op (backprop)
             sess.run(train_op)

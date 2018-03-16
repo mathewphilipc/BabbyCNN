@@ -2,6 +2,7 @@
 # blob/master/examples/5_DataManagement/build_an_image_dataset.py
 
 from __future__ import print_function
+from __future__ import division
 
 import tensorflow as tf
 import os
@@ -12,9 +13,6 @@ FIRST_TRAINING_SESSION = True
 
 MODEL_PATH = "/home/mathew/NWPU_Models/ResNet/"
 #MODEL_PATH = "/home/ubuntu/NWPU_Models/ResNet/"
-
-
-MINI_OR_FULL = "MINI"
 MINI_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45-MINI"
 #MINI_DATASET_PATH = "/home/ubuntu/data/NWPU-RESISC45-MINI"
 FULL_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45"

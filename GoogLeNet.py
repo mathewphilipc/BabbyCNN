@@ -2,6 +2,7 @@
 # blob/master/examples/5_DataManagement/build_an_image_dataset.py
 
 from __future__ import print_function
+from __future__ import division
 
 import tensorflow as tf
 import os
@@ -10,12 +11,12 @@ import numpy as np
 # Toggle this to False if you're continuing from previous training
 FIRST_TRAINING_SESSION = True
 
-MODEL_PATH = "/home/mathew/NWPU_Models/GoogleNet/"
-
-
-MINI_OR_FULL = "MINI"
+MODEL_PATH = "/home/mathew/NWPU_Models/ResNet/"
+#MODEL_PATH = "/home/ubuntu/NWPU_Models/ResNet/"
 MINI_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45-MINI"
+#MINI_DATASET_PATH = "/home/ubuntu/data/NWPU-RESISC45-MINI"
 FULL_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45"
+#FULL_DATASET_PATH = "/home/ubuntu/data/NWPU-RESISC45"
 
 
 MODE = 'folder'
@@ -32,7 +33,7 @@ IMG_WIDTH = 128 # original size = 256
 CHANNELS = 3 # we have full-color images
 
 
-TRAIN_FRAC = 0.90
+TRAIN_FRAC = 0.95
 
 # For deterministic, consistent train/test splitting across runs
 np.random.seed(0)

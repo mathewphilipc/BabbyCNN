@@ -12,7 +12,7 @@ import numpy as np
 FIRST_TRAINING_SESSION = True
 
 MODEL_PATH = "/home/mathew/NWPU_Models/AlexNet/"
-#MODEL_PATH = "/home/ubuntu/NWPU_Models/ResNet/"
+#MODEL_PATH = "/home/ubuntu/NWPU_Models/AlexNet/"
 MINI_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45-MINI"
 #MINI_DATASET_PATH = "/home/ubuntu/data/NWPU-RESISC45-MINI"
 FULL_DATASET_PATH = "/home/mathew/Desktop/NWPU-RESISC45"

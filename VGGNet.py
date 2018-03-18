@@ -9,7 +9,7 @@ import os
 import numpy as np
 
 # Toggle this to False if you're continuing from previous training
-FIRST_TRAINING_SESSION = False
+FIRST_TRAINING_SESSION = True
 
 MODEL_PATH = "/home/mathew/NWPU_Models/VGGNet/"
 #MODEL_PATH = "/home/ubuntu/NWPU_Models/ResNet/"

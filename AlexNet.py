@@ -45,38 +45,27 @@ def read_images(dataset_path, mode, batch_size):
     test_imagepaths = list()
     train_labels = list()
     test_labels = list()
-    if mode == 'folder':
-        # Count how many (image, label) pairs go into testing vs training
-        total_test_count = 0;
-        total_train_count = 0;
-        # An ID will be affected to each sub-folders by alphabetical order
-        label = 0
-        image_count = 0;
-        # List the directory
-        classes = sorted(os.walk(dataset_path).next()[1])
-        # List each sub-directory (the classes)
-        for c in classes:
-            #print("Now on class number %d: %s" % (label, c))
-            c_dir = os.path.join(dataset_path, c)
-            walk = os.walk(c_dir).next()
-            # Add each image to the training set
-            for sample in walk[2]:
-                # Only keeps jpeg images
-                test_or_train = np.random.rand()
-                    # Add image+label to either test or train set
-                if (test_or_train > TRAIN_FRAC):
-                    test_imagepaths.append(os.path.join(c_dir, sample))
-                    test_labels.append(label)
-                    total_test_count += 1
-
-                else:
-                    train_imagepaths.append(os.path.join(c_dir, sample))
-                    train_labels.append(label)
-                    total_train_count += 1
-                image_count += 1
-            label += 1
-    else:
-        raise Exception("Unknown mode.")
+    # Count how many (image, label) pairs go into testing vs training
+    [total_test_count, total_train_count] = [0, 0]
+    [label, image_count] = [0, 0];
+    classes = sorted(os.walk(dataset_path).next()[1])
+    for c in classes:
+        c_dir = os.path.join(dataset_path, c)
+        walk = os.walk(c_dir).next()
+        # Add each image to the training set
+        for sample in walk[2]:
+            test_or_train = np.random.rand()
+            # Add image+label to either test or train set
+            if (test_or_train > TRAIN_FRAC):
+                test_imagepaths.append(os.path.join(c_dir, sample))
+                test_labels.append(label)
+                total_test_count += 1
+            else:
+                train_imagepaths.append(os.path.join(c_dir, sample))
+                train_labels.append(label)
+                total_train_count += 1
+            image_count += 1
+        label += 1
 
     # Convert to Tensor
     train_imagepaths = tf.convert_to_tensor(train_imagepaths, dtype=tf.string)
@@ -89,21 +78,12 @@ def read_images(dataset_path, mode, batch_size):
     test_image, test_label = tf.train.slice_input_producer([test_imagepaths, test_labels],
                                                  shuffle=True)
 
-    # Read images from disk
-    train_image = tf.read_file(train_image)
-    train_image = tf.image.decode_jpeg(train_image, channels=CHANNELS)
-    test_image = tf.read_file(test_image)
-    test_image = tf.image.decode_jpeg(test_image, channels=CHANNELS)
+    # Read, resize, and normalize
+    train_image = tf.image.decode_jpeg(tf.read_file(train_image), channels=CHANNELS)
+    train_image = tf.image.resize_images(train_image, [IMG_HEIGHT, IMG_WIDTH]) * 1.0/127.5 - 1.0
+    test_image = tf.image.decode_jpeg(tf.read_file(test_image), channels=CHANNELS)
+    test_image = tf.image.resize_images(test_image, [IMG_HEIGHT, IMG_WIDTH]) * 1.0/127.5 - 1.0
 
-    # Resize images to a common size
-    train_image = tf.image.resize_images(train_image, [IMG_HEIGHT, IMG_WIDTH])
-    test_image = tf.image.resize_images(test_image, [IMG_HEIGHT, IMG_WIDTH])
-
-    # Normalize
-    train_image = train_image * 1.0/127.5 - 1.0
-    test_image = test_image * 1.0/127.5 - 1.0
-
-    # Create batches
 
     print("\nFound all images and labels in NWPU-RESISC45...\n")
 
@@ -118,7 +98,7 @@ def read_images(dataset_path, mode, batch_size):
 # Set hyperparameters
 
 learning_rate = 0.0001
-num_steps = 5
+num_steps = 100
 batch_size = 300
 display_step = 1
 dropout = 0.5
@@ -128,7 +108,7 @@ dropout = 0.5
 
 train_image, test_image, train_label, test_label, total_train_count, total_test_count = read_images(DATASET_PATH, MODE, batch_size)
 
-test_batch_size = total_test_count // 50
+test_batch_size = total_test_count // 10
 
 
 

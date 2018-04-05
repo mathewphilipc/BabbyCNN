@@ -45,15 +45,15 @@ def read_images(dataset_path, mode, batch_size):
     test_imagepaths = list()
     train_labels = list()
     test_labels = list()
-    if mode == 'file':
+#    if mode == 'file':
         # Read dataset file
-        data = open(dataset_path, 'r').read().splitlines()
-        for d in data:
-            train_imagepaths.append(d.split(' ')[0])
-            test_imagepaths.append(d.split(' ')[0])
-            train_labels.append(int(d.split(' ')[1]))
-            test_labels.append(int(d.split(' ')[1]))
-    elif mode == 'folder':
+#        data = open(dataset_path, 'r').read().splitlines()
+#        for d in data:
+#            train_imagepaths.append(d.split(' ')[0])
+#            test_imagepaths.append(d.split(' ')[0])
+#            train_labels.append(int(d.split(' ')[1]))
+#            test_labels.append(int(d.split(' ')[1]))
+    if mode == 'folder':
         # Count how many (image, label) pairs go into testing vs training
         total_test_count = 0;
         total_train_count = 0;
@@ -133,8 +133,8 @@ def read_images(dataset_path, mode, batch_size):
 # Set hyperparameters
 
 learning_rate = 0.0001
-num_steps = 50
-batch_size = 200
+num_steps = 5
+batch_size = 300
 display_step = 1
 dropout = 0.5
 
@@ -143,7 +143,7 @@ dropout = 0.5
 
 train_image, test_image, train_label, test_label, total_train_count, total_test_count = read_images(DATASET_PATH, MODE, batch_size)
 
-test_batch_size = total_test_count // 10
+test_batch_size = total_test_count // 50
 
 
 

@@ -45,14 +45,6 @@ def read_images(dataset_path, mode, batch_size):
     test_imagepaths = list()
     train_labels = list()
     test_labels = list()
-#    if mode == 'file':
-        # Read dataset file
-#        data = open(dataset_path, 'r').read().splitlines()
-#        for d in data:
-#            train_imagepaths.append(d.split(' ')[0])
-#            test_imagepaths.append(d.split(' ')[0])
-#            train_labels.append(int(d.split(' ')[1]))
-#            test_labels.append(int(d.split(' ')[1]))
     if mode == 'folder':
         # Count how many (image, label) pairs go into testing vs training
         total_test_count = 0;
@@ -61,34 +53,27 @@ def read_images(dataset_path, mode, batch_size):
         label = 0
         image_count = 0;
         # List the directory
-        try:  # Python 2
-            classes = sorted(os.walk(dataset_path).next()[1])
-        except Exception:  # Python 3
-            classes = sorted(os.walk(dataset_path).__next__()[1])
+        classes = sorted(os.walk(dataset_path).next()[1])
         # List each sub-directory (the classes)
         for c in classes:
             #print("Now on class number %d: %s" % (label, c))
             c_dir = os.path.join(dataset_path, c)
-            try:  # Python 2
-                walk = os.walk(c_dir).next()
-            except Exception:  # Python 3
-                walk = os.walk(c_dir).__next__()
+            walk = os.walk(c_dir).next()
             # Add each image to the training set
             for sample in walk[2]:
                 # Only keeps jpeg images
-                if sample.endswith('.jpg') or sample.endswith('.jpeg'):
-                    test_or_train = np.random.rand()
+                test_or_train = np.random.rand()
                     # Add image+label to either test or train set
-                    if (test_or_train > TRAIN_FRAC):
-                        test_imagepaths.append(os.path.join(c_dir, sample))
-                        test_labels.append(label)
-                        total_test_count += 1
+                if (test_or_train > TRAIN_FRAC):
+                    test_imagepaths.append(os.path.join(c_dir, sample))
+                    test_labels.append(label)
+                    total_test_count += 1
 
-                    else:
-                        train_imagepaths.append(os.path.join(c_dir, sample))
-                        train_labels.append(label)
-                        total_train_count += 1
-                    image_count += 1
+                else:
+                    train_imagepaths.append(os.path.join(c_dir, sample))
+                    train_labels.append(label)
+                    total_train_count += 1
+                image_count += 1
             label += 1
     else:
         raise Exception("Unknown mode.")
